@@ -1,7 +1,7 @@
 import sys
 import math
 
-class Graph(object):
+class Global_Navigation(object):
     def __init__(self, nodes):
         self.nodes = nodes
         self.graph = {}
@@ -69,9 +69,9 @@ class Graph(object):
                     current_min_node = node
                     
             # The code block below retrieves the current node's neighbors and updates their distances
-            neighbors = graph.get_outgoing_edges(current_min_node)
+            neighbors = self.get_outgoing_edges(current_min_node)
             for neighbor in neighbors:
-                tentative_value = shortest_path[current_min_node] + graph.dist(current_min_node, neighbor)
+                tentative_value = shortest_path[current_min_node] + self.dist(current_min_node, neighbor)
                 if tentative_value < shortest_path[neighbor]:
                     shortest_path[neighbor] = tentative_value
                     previous_nodes[neighbor] = current_min_node
@@ -82,7 +82,7 @@ class Graph(object):
         return previous_nodes, shortest_path
     
     def path_planning(self,start_node,target_node):
-        previous_nodes, shortest_path = graph.dijkstra(start_node)
+        previous_nodes, shortest_path = self.dijkstra(start_node)
         node = target_node
         path = []
         while node != start_node:
@@ -94,22 +94,3 @@ class Graph(object):
         print(str(start_node) + " -> " + " -> ".join(str(a) for a in path))
 
         return path
-
-
-nodes = [(1,2),(3,4),(5,6),(10,11)]
-
-graph = Graph(nodes)
-
-graph.add_edge((1,2),(3,4))
-graph.add_edge((1,2),(5,6))
-graph.add_edge((3,4),(10,11))
-graph.add_edge((10,11),(5,6))
-
-
-start_node = (1,2)
-target_node= (10,11)
-
-
-path = graph.path_planning(start_node,target_node)
-
-print(path)
