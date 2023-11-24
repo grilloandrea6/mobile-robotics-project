@@ -2,10 +2,10 @@ import sys
 import math
 
 # distance to a waypoint to be considered achieved
-EPS = 10
+EPS = 1
 
 # default constant speed
-VEL = 50
+VEL = 30
 
 # radius of thymio wheels
 R = 20
@@ -17,10 +17,9 @@ L = 105
 CONV_RATIO = 65
 
 # 
-THRESHOLD = 6000
+THRESHOLD = 6000  
 
-KP_ALPHA = .5
-KP_BETA = .5
+KP_ALPHA = 10
 
 
 class Local_Navigation(object):
@@ -79,52 +78,40 @@ class Local_Navigation(object):
     return int(wl), int(wr)
 
 
-  def path_follow(self, pose)
-
-    #pose should be a (x,y,theta) tuple
-
-
+  def path_follow(self, pose):
+    #pose is a (x,y,theta) tuple
     objective = self.path[self.waypoint_counter]
     next_objective = self.path[self.waypoint_counter + 1]
 
     distance = self.dist(pose,objective)
 
-    # check if we reached the objective
-    if distance < EPS:
-      self.waypoint_counter+=1
-      objective = self.path[self.waypoint_counter]
-    
     x_diff, y_diff = objective[0] - pose[0], objective[1] - pose[1]
     thymio_angle = pose[2]
     obj_angle = math.atan2(next_objective[1] - objective[1], next_objective[0] - next_objective[0])
 
-    #theta_diff = math.atan2(y_diff, x_diff)
-   
-    
-    #alpha=-thymio_angle + math.atan2(-y_diff,x_diff)
-    #beta=-actual_angle-alpha
 
-    #alpha = -actual_angle + theta # maybe not exactly theta
-    #deta = -actual_angle - alpha
+    print(f"My pose is {pose}")
+    print(f"My objective is {objective}")
+    print(f"Distance is {distance}")
 
+    # check if we reached the objective
+    if distance < EPS:
+      print(f"reached objective number {self.waypoint_counter}")
+      self.waypoint_counter+=1
+      if self.waypoint_counter >= len(self.path) - 1:
+        print("finished!")
+        return (-1,-1)
+      else:
+        return self.path_follow(pose)
+      
+    alpha = (math.atan2(y_diff,x_diff) - thymio_angle + math.pi) % ( 2 * math.pi) - math.pi
+    beta = (obj_angle - thymio_angle + math.pi) % ( 2 * math.pi) - math.pi
+    w = KP_ALPHA * alpha #*( distance * alpha + 1/(1 + distance) * beta)
 
-    #alpha = ( - theta + math.pi) % (2 * math.pi) - math.pi
-    #theta = pose[2]
-        
-    #alpha = (math.atan2(y_diff, x_diff) - theta + math.pi) % (2 * math.pi) - math.pi
-    #beta = (theta_goal - theta - alpha + math.pi) % (2 * math.pi) - math.pi
-    alpha = (math.atan2(y_diff, x_diff) - theta + math.pi) % (2 * math.pi) - math.pi
-    beta = (obj_angle - theta - alpha + math.pi) % (2 * math.pi) - math.pi
-
-
-    w = KP_ALPHA * alpha + KP_BETA * beta
-
-    v = VEL if alpha > math.pi / 2 or alpha < -math.pi / 2 else -VEL
-
-    return differential_steering(v,w)
+    return VEL,w 
   
 
-  def differential_steering(self, v, w)
+  def differential_steering(self, v, w):
     wl = CONV_RATIO * (2*v - w*L)/(2*R) # left motor speed
     wr = CONV_RATIO * (2*v + w*L)/(2*R) # right motor speed
     
