@@ -2,7 +2,7 @@ import sys
 import math
 
 # distance to a waypoint to be considered achieved
-EPS = 1
+EPS = .3
 
 # default constant speed
 VEL = 30
@@ -19,7 +19,7 @@ CONV_RATIO = 65
 # 
 THRESHOLD = 6000  
 
-KP_ALPHA = 10
+KP_ALPHA = 20
 
 
 class Local_Navigation(object):
