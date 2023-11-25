@@ -2,7 +2,7 @@ import sys
 import math
 
 # distance to a waypoint to be considered achieved
-EPS = .3
+EPS = .1
 
 # default constant speed
 VEL = 30
@@ -19,7 +19,9 @@ CONV_RATIO = 65
 # 
 THRESHOLD = 6000  
 
-KP_ALPHA = 20
+KP_ALPHA = 14
+KP_BETA = -1
+KP_DIST = 1
 
 
 class Local_Navigation(object):
@@ -79,16 +81,13 @@ class Local_Navigation(object):
 
 
   def path_follow(self, pose):
+    # ASTOLFI CONTROLLER
     #pose is a (x,y,theta) tuple
     objective = self.path[self.waypoint_counter]
-    next_objective = self.path[self.waypoint_counter + 1]
-
     distance = self.dist(pose,objective)
 
     x_diff, y_diff = objective[0] - pose[0], objective[1] - pose[1]
     thymio_angle = pose[2]
-    obj_angle = math.atan2(next_objective[1] - objective[1], next_objective[0] - next_objective[0])
-
 
     print(f"My pose is {pose}")
     print(f"My objective is {objective}")
@@ -98,27 +97,24 @@ class Local_Navigation(object):
     if distance < EPS:
       print(f"reached objective number {self.waypoint_counter}")
       self.waypoint_counter+=1
-      if self.waypoint_counter >= len(self.path) - 1:
+      if self.waypoint_counter >= len(self.path) :
         print("finished!")
         return (-1,-1)
       else:
         return self.path_follow(pose)
       
     alpha = (math.atan2(y_diff,x_diff) - thymio_angle + math.pi) % ( 2 * math.pi) - math.pi
-    beta = (obj_angle - thymio_angle + math.pi) % ( 2 * math.pi) - math.pi
-    w = KP_ALPHA * alpha #*( distance * alpha + 1/(1 + distance) * beta)
+    beta = (-thymio_angle -alpha + math.pi) % ( 2 * math.pi) - math.pi
 
-    return VEL,w 
+    w = KP_ALPHA * alpha + KP_BETA * beta
+    v = KP_DIST * distance
+    return v,w 
   
-
   def differential_steering(self, v, w):
     wl = CONV_RATIO * (2*v - w*L)/(2*R) # left motor speed
     wr = CONV_RATIO * (2*v + w*L)/(2*R) # right motor speed
     
     return int(wl), int(wr)
 
-
   def dist(self,a,b):
-    return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)     
-
-
+    return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
