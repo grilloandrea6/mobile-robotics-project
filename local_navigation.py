@@ -1,8 +1,9 @@
-import sys
 import math
 
+# CONSTANT DEFINITION
+
 # distance to a waypoint to be considered achieved
-EPS = .1
+EPS = 5
 
 # default constant speed
 VEL = 30
@@ -14,20 +15,18 @@ R = 20
 L = 105
 
 # conversion ratio speed rad/s to thymio's speed 
-CONV_RATIO = 65
+CONV_RATIO = 1
 
 # 
 THRESHOLD = 6000  
 
-KP_ALPHA = 14
-KP_BETA = -1
-KP_DIST = 1
+KP_ALPHA = 1
+KP_BETA = -.5
+KP_DIST = 3
 
+# END CONSTANT DEFINITION
 
 class Local_Navigation(object):
-  #def __init__(self, path):
-  #  print("init of the class")
-
   def __init__(self, path):
     self.path = path
     self.waypoint_counter = 0
@@ -56,8 +55,6 @@ class Local_Navigation(object):
       return False
 
   def obstacle_avoidance(self, sensor_data, old_vel):
-    global prox_horizontal, motor_left_target, motor_right_target, button_center, state
-
     w_l = [40,  20, -20, -20, -40,  30, -10, 8, 0]
     w_r = [-40, -20, -20,  20,  40, -10,  30, 0, 8]
 
@@ -70,7 +67,7 @@ class Local_Navigation(object):
         
     for i in range(len(x)):
         # Get and scale inputs
-        x[i] = prox_horizontal[i] // sensor_scale
+        x[i] = sensor_data[i] // sensor_scale
         
         # Compute outputs of neurons and set motor powers
         wl = wl + x[i] * w_l[i]
