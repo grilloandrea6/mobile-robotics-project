@@ -28,6 +28,7 @@ KP_DIST = 3
 
 class Local_Navigation(object):
   def __init__(self, path):
+    print("init local nav")
     self.path = path
     self.waypoint_counter = 0
     self.state = 0 # 0 -> path following / 1 -> obstacle avoidance
@@ -60,7 +61,6 @@ class Local_Navigation(object):
 
     # Scale factors for sensors and constant factor
     sensor_scale = 200
-    constant_scale = 20
     
     wl = wr = 0
     x = [0,0,0,0,0,0,0,old_vel[0], old_vel[1]]
@@ -76,6 +76,8 @@ class Local_Navigation(object):
     # Set motor powers
     return int(wl), int(wr)
 
+  def radToDeg(self,angle):
+    return angle * 180 / math.pi
 
   def path_follow(self, pose):
     # ASTOLFI CONTROLLER
@@ -86,9 +88,11 @@ class Local_Navigation(object):
     x_diff, y_diff = objective[0] - pose[0], objective[1] - pose[1]
     thymio_angle = pose[2]
 
-    print(f"My pose is {pose}")
+    print(f"My pose is {pose[0]} {pose[1]} {self.radToDeg(pose[2])}")
     print(f"My objective is {objective}")
     print(f"Distance is {distance}")
+    print(f"the angle i have to follow {self.radToDeg(math.atan2(y_diff,x_diff))}")
+    
 
     # check if we reached the objective
     if distance < EPS:
