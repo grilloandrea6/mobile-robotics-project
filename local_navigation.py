@@ -35,46 +35,41 @@ class Local_Navigation(object):
 
   def control(self, pose, sensor_data):
     if not self.present_obstacle(sensor_data):
-      return self.path_follow(pose)
+      v,w = self.path_follow(pose)
+      return self.differential_steering(v,w)
     else:
       return self.obstacle_avoidance(sensor_data)
 
   def present_obstacle(self,sensor_data):
-    if self.state == 0 :
-      # we have been following the path until now, we have to check if there's an obstacle
-      
       # we want to give more weight to the front sensor (2) as we do not want       
-      weighted_sum = sensor_data[0] * 1 + sensor_data[1] * 3 + sensor_data[2] * 10 +  sensor_data[3] * 3 + sensor_data[4] * 1
-      if weighted_sum > THRESHOLD:
-        self.state = 1
+      for i in range(len(sensor_data)):
+        sum += sensor_data[i]
+      
+      if sum > 0:
         return True
       else:
         return False
-    else:
-      # we have been avoiding obstacles, we have to check if we can go back to path following
-      #TODO
-      return False
 
-  def obstacle_avoidance(self, sensor_data, old_vel):
-    w_l = [40,  20, -20, -20, -40,  30, -10, 8, 0]
-    w_r = [-40, -20, -20,  20,  40, -10,  30, 0, 8]
 
-    # Scale factors for sensors and constant factor
-    sensor_scale = 200
-    
-    wl = wr = 0
-    x = [0,0,0,0,0,0,0,old_vel[0], old_vel[1]]
-        
+  def obst_avoid(self, data):
+    w_l = [6,  11, -10, -11, -6,  0,0]
+    w_r = [-6, -11, -12.5,  11,  6, 0,0]
+
+    # Scale factors for sensors
+    sensor_scale = 230
+
+    y = [0,0]
+    x = [0,0,0,0,0,0,0]
+
     for i in range(len(x)):
         # Get and scale inputs
-        x[i] = sensor_data[i] // sensor_scale
+        x[i] = data[i] / sensor_scale
         
         # Compute outputs of neurons and set motor powers
-        wl = wl + x[i] * w_l[i]
-        wr = wr + x[i] * w_r[i]
-    
-    # Set motor powers
-    return int(wl), int(wr)
+        y[0] = y[0] + x[i] * w_l[i]
+        y[1] = y[1] + x[i] * w_r[i]
+
+    return int(115 + y[0]),int(115 + y[1])
 
   def radToDeg(self,angle):
     return angle * 180 / math.pi
