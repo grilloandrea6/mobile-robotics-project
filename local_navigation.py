@@ -15,14 +15,14 @@ R = 20
 L = 105
 
 # conversion ratio speed rad/s to thymio's speed 
-CONV_RATIO = 1
+CONV_RATIO = 2
 
 # 
 THRESHOLD = 6000  
 
 KP_ALPHA = 1
 KP_BETA = -.5
-KP_DIST = 3
+KP_DIST = 70
 
 # END CONSTANT DEFINITION
 
@@ -92,7 +92,6 @@ class Local_Navigation(object):
     print(f"My objective is {objective}")
     print(f"Distance is {distance}")
     print(f"the angle i have to follow {self.radToDeg(math.atan2(y_diff,x_diff))}")
-    
 
     # check if we reached the objective
     if distance < EPS:
@@ -104,11 +103,16 @@ class Local_Navigation(object):
       else:
         return self.path_follow(pose)
       
-    alpha = (math.atan2(y_diff,x_diff) - thymio_angle + math.pi) % ( 2 * math.pi) - math.pi
-    beta = (-thymio_angle -alpha + math.pi) % ( 2 * math.pi) - math.pi
+    #alpha = (- math.atan2(y_diff,x_diff) + thymio_angle + 5*math.pi) % ( 2 * math.pi) - math.pi
+    diff_angle = self.radToDeg(math.atan2(y_diff,x_diff))
+    thymio_angle = self.radToDeg(thymio_angle)
+    alpha = (thymio_angle - diff_angle + 180) % 360 - 180
+    print(f"DELTA ANGLE DEG: {alpha}")
+
+    beta = (thymio_angle + alpha + math.pi) % ( 2 * math.pi) - math.pi
 
     w = KP_ALPHA * alpha + KP_BETA * beta
-    v = KP_DIST * distance
+    v = 2000 #KP_DIST * distance
     return v,w 
   
   def differential_steering(self, v, w):
