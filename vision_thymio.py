@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
-import time
+import global_navigation as gn
+
 ### Markers detection functions
 
 # We use IDs: - 1 for the direction of the thymio
@@ -93,18 +94,19 @@ def getPerspectiveAndScaling(cap, dict, width_roi=48.4, height_roi= 31):
                             [wmax, hmax],
                             [wmax, 0]], np.float32)
             
-            
-            img = cv2.circle(img, pointA.astype(int), radius=0, color= (0,0,255), thickness = 5)
-            img = cv2.circle(img, pointB.astype(int), radius=0, color= (0,255,0), thickness = 5)
-            img = cv2.circle(img, pointC.astype(int), radius=0, color= (255,0,0), thickness = 5)
-            img = cv2.circle(img, pointD.astype(int), radius=0, color= (120,120,120), thickness = 5)
-            
-            # delete
-            cv2.imshow("point for ROI", img)
-            while True:
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break 
-            
+
+            # AG - disable display to be used in jupyter notebook
+            #img = cv2.circle(img, pointA.astype(int), radius=0, color= (0,0,255), thickness = 5)
+            #img = cv2.circle(img, pointB.astype(int), radius=0, color= (0,255,0), thickness = 5)
+            #img = cv2.circle(img, pointC.astype(int), radius=0, color= (255,0,0), thickness = 5)
+            #img = cv2.circle(img, pointD.astype(int), radius=0, color= (120,120,120), thickness = 5)
+            #
+            ## delete
+            #cv2.imshow("point for ROI", img)
+            #while True:
+            #    if cv2.waitKey(1) & 0xFF == ord('q'):
+            #        break 
+
             transformMatrix = cv2.getPerspectiveTransform(inputPoints, outputPoints)
             
             sizeROI = np.array([hmax, wmax]).astype(int)
