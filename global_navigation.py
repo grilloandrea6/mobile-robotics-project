@@ -72,9 +72,9 @@ def drawSimplifiedContours(contours, img):
     
     return img, listContour
 
-def addStartAndGoal(img, contourList, start, goal, scalingFactor):
-    y, x = img.shape[0:2]
-    print(contourList)
+def addStartAndGoal(contourList, start, goal, scalingFactor):
+    #AG - not needed - y, x = img.shape[0:2]
+    #print(contourList)
     start = np.array(([(start/scalingFactor)]),np.int32)
     goal = np.array(([(goal/scalingFactor)]),np.int32)
     
@@ -82,8 +82,8 @@ def addStartAndGoal(img, contourList, start, goal, scalingFactor):
     contourList.append(goal) # Goal
     contourList.insert(0, start)  # Start
     
-    print(contourList)
-    return img, contourList
+    #print(contourList)
+    return contourList
 
 def findShortestPath(contourList):
     polyList = list()
@@ -97,7 +97,7 @@ def findShortestPath(contourList):
             
         poly.append(polyList)
 
-    print(poly)
+    #print(poly)
     g = vg.VisGraph()
     g.build(poly[1:-2], status = False)
     shortest = g.shortest_path(vg.Point(contourList[0][0,0], contourList[0][0,1]), vg.Point(contourList[-1][0,0], contourList[-1][0,1]))
