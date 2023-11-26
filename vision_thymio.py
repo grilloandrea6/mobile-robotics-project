@@ -1,7 +1,6 @@
 import numpy as np
 import cv2
 import time
-import globalNavigation as gn
 ### Markers detection functions
 
 # We use IDs: - 1 for the direction of the thymio
