@@ -8,20 +8,25 @@ def prepareImage(frame, threshold = 100):
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)   
     
+    # Noise reduction 
     gray = cv2.GaussianBlur(gray, (3, 3), 0)
     gray = cv2.medianBlur(gray, 3)
 
     _ ,thresh = cv2.threshold(gray, threshold,255,0)
+
+    # Morphological transfsormations to get the outline of an object
+    # Done by taking the difference between the dilated img and itself.
     thresh = cv2.morphologyEx(thresh, cv2.MORPH_GRADIENT, kernel)
-    thresh = cv2.dilate(thresh,kernel,iterations = 5)
+    thresh = cv2.dilate(thresh, kernel, iterations = 5)
         
     return thresh
 
 def approx_contour(contour, epsilon = 10.0, closed = True):
+    # Delete unnecessary points within a margin on a straight line
     contour_approx = cv2.approxPolyDP(contour, epsilon = 10.0, closed = True)
     return contour_approx
 
-def contourCenter(contour):        
+def contourCenter(contour):
     M = cv2.moments(contour)
     cX = int(M["m10"] / M["m00"])
     cY = int(M["m01"] / M["m00"])
@@ -30,14 +35,14 @@ def contourCenter(contour):
 
 def getLength(p1, p2):
     length = dist(p1, p2)
-    return length   
+    return length
 
 def getDilatationScale(d1, d2):
     return d1/d2
 
 def scalePointsFromCenter(points, center, length):
     for p in range(points.shape[0]):
-        distCenter = getLength(center, [points[p,0,0], points[p,0,1]] )
+        distCenter = getLength(center, [points[p,0,0], points[p,0,1]])
         scale = getDilatationScale(distCenter+length, distCenter)
         
         # Translate to center
@@ -56,7 +61,7 @@ def drawSimplifiedContours(contours, img):
             # by looking at the smallest square area that they can fill
             [_ , (height, width), _] = cv2.minAreaRect(cont)
             area = height*width
-            if area < 2500: # equivalent to a square of 50x50
+            if area < 2500: # equivalent to a square of 50x50 px
                 continue
             
             # Approximation on contour into few points and scaling of those points

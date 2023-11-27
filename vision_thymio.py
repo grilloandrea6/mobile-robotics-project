@@ -11,9 +11,10 @@ class Vision_Thymio(object):
         self.cap = self.startVideoCapture()
         self.dict = self.initDictAruco()
     
-# We use IDs: - 1 for the direction of the thymio
-#             - 2 for the goal
-#             - 3 and 4 to get the scaling factor of the distances by knowing the distance in meters
+    # We use IDs: 
+    # - 1 for the pos and direction of the thymio
+    # - 2 for the goal
+    # - 3, 4, 5, and 6 to get the scaling factor and perspective transformation matrix
         
     def initDictAruco(self,type = cv2.aruco.DICT_4X4_50):
         dict = cv2.aruco.getPredefinedDictionary(type)
@@ -24,7 +25,8 @@ class Vision_Thymio(object):
         corners = []
         
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        # Corners are given in clockwise order starting with top left 
+
+        # Corners are returned in clockwise order starting with top left
         corners, ids, _ = cv2.aruco.detectMarkers(image=img, dictionary=self.dict)
         
         if len(corners) != 0:
@@ -38,13 +40,13 @@ class Vision_Thymio(object):
     def getFrame(self):
         
         # These are the values used to correct different types of opticals aberations
-        # such as the spherical aberation or the tangential one
-        # These values have been found after following a valibration process
+        # such as spherical or tangential aberation. 
+        # These values have been found after following a calibration process
         # (opencv camera calibration with charuco patterns)
         
-        mtx = np.array([[989.7401734,    0.,         653.72226958],
-                [  0.,         998.64802591, 347.61109886],
-                [  0.,           0.,           1.        ]])
+        mtx = np.array([[989.7401734,  0.,           653.72226958],
+                        [0.,           998.64802591, 347.61109886],
+                        [0.,           0.,           1.          ]])
         dist = np.array([[ 0.12258701, -0.76974406, -0.00790144,  0.00456124,  1.16348775]])
         
         _, frame = self.cap.read()
@@ -58,11 +60,11 @@ class Vision_Thymio(object):
         dst = dst[y:y+h, x:x+w]
         return dst
 
-    # We compute a scaling factor by dividing the distance
-    # between two Arcuo Markers measured in px and in meters
+    # We compute a scaling factor by dividing the distance between
+    # two Arcuo Markers measured in px by the distance in meters.
 
     # The perspective transformation is found by takeing 4 corners of the ROI
-    # We can then map our image to a new one with corrected perspective
+    # We can then map our image to a new one with corrected perspective.
     def getPerspectiveAndScaling(self, width_roi=48.4, height_roi= 31):
         
         # Need to measure the size of the ROI in real life
@@ -89,9 +91,7 @@ class Vision_Thymio(object):
                 pointC = mark5[0,:]
                 pointD = mark6[3,:]
 
-                # Warning, the point corresponding must be the closest to the  -->  to verify
                 inputPoints = np.array([pointA, pointB, pointC, pointD],np.float32)
-
                 
                 hmax = img.shape[1]
                 wmax = hmax*ratio_vh
@@ -100,19 +100,6 @@ class Vision_Thymio(object):
                                 [0, hmax],
                                 [wmax, hmax],
                                 [wmax, 0]], np.float32)
-                
-
-                # AG - disable display to be used in jupyter notebook
-                #img = cv2.circle(img, pointA.astype(int), radius=0, color= (0,0,255), thickness = 5)
-                #img = cv2.circle(img, pointB.astype(int), radius=0, color= (0,255,0), thickness = 5)
-                #img = cv2.circle(img, pointC.astype(int), radius=0, color= (255,0,0), thickness = 5)
-                #img = cv2.circle(img, pointD.astype(int), radius=0, color= (120,120,120), thickness = 5)
-                #
-                ## delete
-                #cv2.imshow("point for ROI", img)
-                #while True:
-                #    if cv2.waitKey(1) & 0xFF == ord('q'):
-                #        break 
 
                 transformMatrix = cv2.getPerspectiveTransform(inputPoints, outputPoints)
                 
@@ -121,22 +108,21 @@ class Vision_Thymio(object):
                 scalingFactor = height_roi/hmax
             else:
                 transformMatrix = []
-                print("Can't find markers 3,4, 5 and 6 for perspective transformation")
+                print("Can't find markers 3, 4, 5 and 6 for perspective transformation")
 
         self.transformMatrix, self.sizeROI, self.scalingFactor = transformMatrix, sizeROI, scalingFactor
 
     def getCorrectedImage(self):
         img = self.getFrame()
         img = cv2.warpPerspective(img, self.transformMatrix ,(self.sizeROI[1], self.sizeROI[0]),flags=cv2.INTER_LINEAR)
-        # Need to correct the perspective transformation 
-        
+
         return img
         
    
     def getGoalPosition(self, ids, corners):    
         position = []
         found = False
-            
+        
         if (len(ids) != 0) and (2 in ids):
             found = True
             mark = corners[ids.index(2)][0]
@@ -153,7 +139,7 @@ class Vision_Thymio(object):
         pose = ()
         found = False
 
-        # If some aruco patterns are detected, verify if 1 are among them
+        # If some aruco patterns are detected, verify if 1 is among them
         if len(ids) != 0 and 1 in ids:
             found = True
             mark = corners[ids.index(1)][0]
@@ -162,7 +148,7 @@ class Vision_Thymio(object):
             position = (np.sum(mark, 0)/4).astype(int)
             position = (position*self.scalingFactor)
    
-            # Vector for the direction of the thymio (from two left corners of the mark)
+            # Vector for the direction of the thymio (from the two left corners of the marker)
             orientation = mark[0,:]-mark[-1,:]
             orientation = orientation.astype(int)
             orientation = math.atan2(orientation[1],orientation[0])
@@ -208,8 +194,7 @@ class Vision_Thymio(object):
 
     def getOptimalPath(self, start, staticObstacleList, goal):
         path = []
-        
-        
+                
         staticObstacleList = gn.addStartAndGoal(staticObstacleList, start, goal, self.scalingFactor)
 
         path = gn.findShortestPath(contourList = staticObstacleList)
