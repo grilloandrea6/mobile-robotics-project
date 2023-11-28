@@ -184,7 +184,7 @@ class Vision_Thymio(object):
         frame, contourList = gn.drawSimplifiedContours(contours, img)
         
         # AG - commented to be used in jupyter notebook
-        #cv2.imshow("ContourList",frame)
+        cv2.imshow("ContourList",frame)
         #while True:
         #    if cv2.waitKey(1) & 0xFF == ord('q'):
         #        break

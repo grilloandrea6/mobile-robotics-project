@@ -29,10 +29,13 @@ KP_DIST = 70
 class Local_Navigation(object):
   def __init__(self, path):
     print("init local nav")
+    self.waypoint_counter = 0
+    #self.state = 0 # 0 -> path following / 1 -> obstacle avoidance
+
+  def define_path(self,path):
     self.path = path
     self.waypoint_counter = 0
-    self.state = 0 # 0 -> path following / 1 -> obstacle avoidance
-
+    
   def control(self, pose, sensor_data):
     if not self.present_obstacle(sensor_data):
       v,w = self.path_follow(pose)
