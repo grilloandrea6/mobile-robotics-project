@@ -1,6 +1,6 @@
 import numpy as np
 
-class ExtendedKalmanFilter:
+class ExtendedKalmanFilter(object):
     def __init__(self, initial_state, process_noise_cov, measurement_noise_cov):
         self.state = initial_state
         self.process_noise_cov = process_noise_cov
@@ -12,21 +12,23 @@ class ExtendedKalmanFilter:
 
     def _state_transition(self, x, u, dt):
         # State transition function for a differential drive robot
-        v_right, v_left = u
-        v_bar = (v_right + v_left) / 2.0
-        omega = (v_right - v_left) / (2.0 * self.r)
+        v_bar,omega = u
+        #v_right, v_left = u
+        #v_bar = (v_right + v_left) / 2.0
+        #omega = (v_right - v_left) / (2.0 * self.r)
 
         x_new = x[0] + v_bar * dt * np.cos(x[2])
         y_new = x[1] + v_bar * dt * np.sin(x[2])
         theta_new = x[2] - omega * dt
 
-        return np.array([x_new, y_new, theta_new, v_right, v_left])
+        return np.array([x_new, y_new, theta_new, v_bar, omega])
 
     def _calculate_state_transition_matrix(self, x, u, dt):
         # Jacobian matrix A of the state transition function
 
-        v_right, v_left = u
-        v_bar = (v_right + v_left) / 2.0
+        v_bar,omega = u
+        #v_right, v_left = u
+        #v_bar = (v_right + v_left) / 2.0
         theta_i = x[2]
 
         A = np.array([
@@ -74,32 +76,34 @@ class ExtendedKalmanFilter:
         self.P = (np.eye(self.state_dim) - K @ H) @ self.P
 
 
-# Define initial state, process noise covariance, and measurement noise covariance
-initial_state = np.array([0, 0, 0, 0, 0])  # [x, y, theta, v_right, v_left]
-process_noise_cov = np.eye(5) * 0.01  # Adjust the covariance based on your system dynamics
+    '''
+    # Define initial state, process noise covariance, and measurement noise covariance
+    initial_state = np.array([0, 0, 0, 0, 0])  # [x, y, theta, v_right, v_left]
+    process_noise_cov = np.eye(5) * 0.01  # Adjust the covariance based on your system dynamics
 
-camera_noise_cov = np.eye(3) * 0.1
-speed_noise_cov = np.array([[373.6623, 103.2730], [103.2730, 189.5869]])
-measurement_noise_cov = np.block([
-                                    [camera_noise_cov, np.zeros((3, 2))],
-                                    [np.zeros((2, 3)), speed_noise_cov]
-                                ])
+    camera_noise_cov = np.eye(3) * 0.1
+    speed_noise_cov = np.array([[373.6623, 103.2730], [103.2730, 189.5869]])
+    measurement_noise_cov = np.block([
+                                        [camera_noise_cov, np.zeros((3, 2))],
+                                        [np.zeros((2, 3)), speed_noise_cov]
+                                    ])
 
-# Set the trackwidth of the robot
-trackwidth = 94  # in mm
+    # Set the trackwidth of the robot
+    trackwidth = 94  # in mm
 
-# Create an ExtendedKalmanFilter instance
-ekf = ExtendedKalmanFilter(initial_state, process_noise_cov, measurement_noise_cov)
-ekf.r = trackwidth/2.00  # Set the trackwidth in the class instance
+    # Create an ExtendedKalmanFilter instance
+    ekf = ExtendedKalmanFilter(initial_state, process_noise_cov, measurement_noise_cov)
+    ekf.r = trackwidth/2.00  # Set the trackwidth in the class instance
 
-# Main loop
-for _ in range(num_iterations):
-    # Obtain control input and measurement here
-    control_input = np.array([omega_r, omega_l])
-    measurement = np.array([x_cam, y_cam, theta_cam, omega_r_sensor, omega_l_sensor])
+    # Main loop
+    for _ in range(num_iterations):
+        # Obtain control input and measurement here
+        control_input = np.array([omega_r, omega_l])
+        measurement = np.array([x_cam, y_cam, theta_cam, omega_r_sensor, omega_l_sensor])
 
-    # Perform prediction and update steps
-    ekf.predict(control_input, dt)
-    ekf.update(measurement)
+        # Perform prediction and update steps
+        ekf.predict(control_input, dt)
+        ekf.update(measurement)
 
-    x, y, theta, v_right, v_left = ekf.state
+        x, y, theta, v_right, v_left = ekf.state
+    '''

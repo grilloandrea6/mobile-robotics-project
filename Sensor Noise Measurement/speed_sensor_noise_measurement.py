@@ -4,8 +4,8 @@ toggle0=0
 
 leds_top = [32,0,32]
 # Set the motors to a constant speed (in the range [-500, 500])
-motor_left_target= -500
-motor_right_target= -500
+motor_left_target= 200
+motor_right_target= 200
 i=0
 @onevent
 def timer0():

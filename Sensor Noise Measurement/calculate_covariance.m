@@ -22,23 +22,23 @@ speed = 200;
 measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
 measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
 
-fileID = fopen('motor_speed_300.txt');
-C = textscan(fileID,'%d %d');
-speed = 300;
-measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
-measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
-
-fileID = fopen('motor_speed_400.txt');
-C = textscan(fileID,'%d %d');
-speed = 400;
-measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
-measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
-
-fileID = fopen('motor_speed_500.txt');
-C = textscan(fileID,'%d %d');
-speed = 500;
-measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
-measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
+% fileID = fopen('motor_speed_300.txt');
+% C = textscan(fileID,'%d %d');
+% speed = 300;
+% measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
+% measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
+% 
+% fileID = fopen('motor_speed_400.txt');
+% C = textscan(fileID,'%d %d');
+% speed = 400;
+% measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
+% measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
+% 
+% fileID = fopen('motor_speed_500.txt');
+% C = textscan(fileID,'%d %d');
+% speed = 500;
+% measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
+% measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
 
 fileID = fopen('motor_speed_-100.txt');
 C = textscan(fileID,'%d %d');
@@ -52,24 +52,26 @@ speed = -200;
 measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
 measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
 
-fileID = fopen('motor_speed_-300.txt');
-C = textscan(fileID,'%d %d');
-speed = -300;
-measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
-measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
-
-fileID = fopen('motor_speed_-400.txt');
-C = textscan(fileID,'%d %d');
-speed = -400;
-measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
-measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
-
-fileID = fopen('motor_speed_-500.txt');
-C = textscan(fileID,'%d %d');
-speed = -500;
-measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
-measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
+% fileID = fopen('motor_speed_-300.txt');
+% C = textscan(fileID,'%d %d');
+% speed = -300;
+% measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
+% measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
+% 
+% fileID = fopen('motor_speed_-400.txt');
+% C = textscan(fileID,'%d %d');
+% speed = -400;
+% measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
+% measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
+% 
+% fileID = fopen('motor_speed_-500.txt');
+% C = textscan(fileID,'%d %d');
+% speed = -500;
+% measurement_error_left = [measurement_error_left;C{1}(end-4949:end)-speed];
+% measurement_error_right = [measurement_error_right;C{2}(end-4949:end)-speed];
 %% Scatter Plot
+figure('name','Speed Sensor Distribution','numberTitle','off');
+set(gca,'NextPlot','replacechildren','DataAspectRatio',[1 1 1]);
 alpha_val = 0.1; % Set the desired transparency value
 alpha_data = ones(size(measurement_error_left)) * alpha_val;
 size_val = 10;

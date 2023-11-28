@@ -190,6 +190,7 @@ class Vision_Thymio(object):
         #        break
         #cv2.destroyAllWindows()
 
+
         return contourList
 
     def getOptimalPath(self, start, staticObstacleList, goal):
@@ -203,5 +204,5 @@ class Vision_Thymio(object):
         #for i in range(len(path)-1):
         #    img = cv2.line(img, path[i, :], path[i+1, :], color=(0, 0, 255), thickness=2)
         
-        return path*self.scalingFactor
+        return path #*self.scalingFactor
 
