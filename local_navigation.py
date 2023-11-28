@@ -27,8 +27,8 @@ KP_DIST = 70
 # END CONSTANT DEFINITION
 
 class Local_Navigation(object):
-  def __init__(self, path):
-    print("init local nav")
+  def __init__(self):
+    print("Init Local Navigation")
     self.waypoint_counter = 0
     #self.state = 0 # 0 -> path following / 1 -> obstacle avoidance
 

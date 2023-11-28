@@ -7,7 +7,7 @@ import math
 class Vision_Thymio(object):
 
     def __init__(self):
-        print("init object")
+        print("Init Vision Thymio")
         self.cap = self.startVideoCapture()
         self.dict = self.initDictAruco()
     

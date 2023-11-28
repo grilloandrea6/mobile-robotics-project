@@ -1,25 +1,49 @@
 import numpy as np
 
+PROCESS_NOISE_COV =  np.eye(5) * 0.01  # Adjust the covariance based on your system dynamics
+CAMERA_NOISE_COV = np.eye(3) * 0.0001
+CAMERA_COVERED_COV = np.eye(3) * np.inf
+SPEED_NOISE_COV = np.array([[373.6623, 103.2730], [103.2730, 189.5869]])
+MEASUREMENT_NOISE_DEF_COV = np.block([
+                            [CAMERA_NOISE_COV, np.zeros((3, 2))],
+                            [np.zeros((2, 3)), SPEED_NOISE_COV]
+                        ])
+MEASUREMENT_NOISE_KIDNAPPING_COV = np.block([
+                            [CAMERA_COVERED_COV, np.zeros((3, 2))],
+                            [np.zeros((2, 3)), SPEED_NOISE_COV]
+                        ])
+
+KIDNAPPED = True
+NORMAL = False
+
 class ExtendedKalmanFilter(object):
-    def __init__(self, initial_state, process_noise_cov, measurement_noise_cov):
+    def __init__(self):
+        print("Init Extended Kalman Filter")
+        self.process_noise_cov = PROCESS_NOISE_COV
+        self.measurement_noise_cov = MEASUREMENT_NOISE_DEF_COV
+
+    
+    def state_initialization(self,initial_state):
         self.state = initial_state
-        self.process_noise_cov = process_noise_cov
-        self.measurement_noise_cov = measurement_noise_cov
         self.state_dim = len(initial_state)
 
         # Initialize the error covariance matrix
         self.P = np.eye(self.state_dim)
+    
+    def set_mode(self, isKidnapped):
+        if isKidnapped:
+            self.measurement_noise_cov = MEASUREMENT_NOISE_KIDNAPPING_COV
+        else:
+            self.measurement_noise_cov = MEASUREMENT_NOISE_DEF_COV
+
 
     def _state_transition(self, x, u, dt):
         # State transition function for a differential drive robot
         v_bar,omega = u
-        #v_right, v_left = u
-        #v_bar = (v_right + v_left) / 2.0
-        #omega = (v_right - v_left) / (2.0 * self.r)
 
         x_new = x[0] + v_bar * dt * np.cos(x[2])
         y_new = x[1] + v_bar * dt * np.sin(x[2])
-        theta_new = x[2] - omega * dt
+        theta_new = x[2] + omega * dt
 
         return np.array([x_new, y_new, theta_new, v_bar, omega])
 
