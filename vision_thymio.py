@@ -200,6 +200,8 @@ class Vision_Thymio(object):
 
         path = gn.findShortestPath(contourList = staticObstacleList)
         
+        path = path * self.scalingFactor
+
         # AG - adapt it to be run in jupyter notebook
         #for i in range(len(path)-1):
         #    img = cv2.line(img, path[i, :], path[i+1, :], color=(0, 0, 255), thickness=2)
