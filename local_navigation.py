@@ -105,9 +105,9 @@ class Local_Navigation(object):
     diff_angle = self.radToDeg(math.atan2(y_diff,x_diff))
     thymio_angle = self.radToDeg(thymio_angle)
     alpha = (thymio_angle - diff_angle + 180) % 360 - 180
-    print(f"DELTA ANGLE DEG: {alpha}")
+    print(f"AAAA - DELTA ANGLE DEG: {alpha}")
 
-    beta = (thymio_angle + alpha + math.pi) % ( 2 * math.pi) - math.pi
+    beta = 0 #(thymio_angle + alpha + 180) % 360 - 180
 
     w = KP_ALPHA * alpha + KP_BETA * beta
     v = 2000 #KP_DIST * distance
