@@ -104,7 +104,7 @@ def findShortestPath(contourList):
 
     #print(poly)
     g = vg.VisGraph()
-    g.build(poly[1:-2], status = False)
+    g.build(poly[:], status = False)
     shortest = g.shortest_path(vg.Point(contourList[0][0,0], contourList[0][0,1]), vg.Point(contourList[-1][0,0], contourList[-1][0,1]))
 
     shortestPath = list()
