@@ -2,8 +2,9 @@ import numpy as np
 
 PROCESS_NOISE_COV =  np.eye(5) * 0.01  # Adjust the covariance based on your system dynamics
 CAMERA_NOISE_COV = np.eye(3) * 0.0001
-CAMERA_COVERED_COV = np.eye(3) * np.inf
-SPEED_NOISE_COV = np.array([[373.6623, 103.2730], [103.2730, 189.5869]])
+CAMERA_COVERED_COV = np.eye(3) * 99999999
+# SPEED_NOISE_COV = np.array([[373.6623, 103.2730], [103.2730, 189.5869]])
+SPEED_NOISE_COV = np.eye(2)*50
 MEASUREMENT_NOISE_DEF_COV = np.block([
                             [CAMERA_NOISE_COV, np.zeros((3, 2))],
                             [np.zeros((2, 3)), SPEED_NOISE_COV]
@@ -93,6 +94,7 @@ class ExtendedKalmanFilter(object):
 
         # Calculate the Kalman gain
         K = self.P @ H.T @ np.linalg.inv(S)
+        print('K = ',K)
 
         # Update the state and error covariance
         innovation = measurement - self._measurement_model(self.state)

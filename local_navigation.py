@@ -49,11 +49,11 @@ class Local_Navigation(object):
       if not self.present_obstacle(sensor_data):
         self.obstacle_counter -= 1
 
-      return self.obst_avoid(sensor_data), False
+      return (0,0), self.obst_avoid(sensor_data), False
       
     else :
       v,w = self.path_follow(pose)
-      return self.differential_steering(v,w), (v,w) == (-1,-1)
+      return (v,w), self.differential_steering(v,w), (v,w) == (-1,-1)
 
   def obst_avoid(self,data):
     wsx = wdx = 0
@@ -73,10 +73,10 @@ class Local_Navigation(object):
     distance = self.dist(pose,objective)
     angleFollow = self.radToDeg(math.atan2(y_diff,x_diff))
 
-    print(f"My pose is {pose[0]} {pose[1]} {thymio_angle}")
-    print(f"My objective is {objective}")
-    print(f"Distance is {distance}")
-    print(f"the angle i have to follow {angleFollow}")
+    #print(f"My pose is {pose[0]} {pose[1]} {thymio_angle}")
+    #print(f"My objective is {objective}")
+    #print(f"Distance is {distance}")
+    #print(f"the angle i have to follow {angleFollow}")
 
     # check if we reached the objective
     if distance < EPS:
@@ -92,7 +92,7 @@ class Local_Navigation(object):
     # the heading we have to follow to reach the objective
     # scaled to be in the interval [-180,+180]
     alpha = (thymio_angle - angleFollow + 180) % 360 - 180
-    print(f"DELTA ANGLE DEG: {alpha}")
+    #print(f"DELTA ANGLE DEG: {alpha}")
 
     return VEL, KP_ALPHA * alpha 
   
