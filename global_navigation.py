@@ -12,7 +12,7 @@ def prepareImage(frame, threshold = 100):
     gray = cv2.GaussianBlur(gray, (3, 3), 0)
     gray = cv2.medianBlur(gray, 3)
 
-    _ ,thresh = cv2.threshold(gray, threshold,255,0)
+    _ ,thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     # Morphological transfsormations to get the outline of an object
     # Done by taking the difference between the dilated img and itself.
@@ -53,7 +53,7 @@ def scalePointsFromCenter(points, center, length):
         points[p, 0, :] = points[p, 0, :] + center
     return points
 
-def drawSimplifiedContours(contours, img):
+def drawSimplifiedContours(contours, img, scalingFactor):
     listContour = list()
     if len(contours) > 0:
         for cont in contours:
@@ -68,10 +68,10 @@ def drawSimplifiedContours(contours, img):
             contour_approx = approx_contour(cont)
             
             # There's a problem with the center calculation
-            #contour_scaled = scalePointsFromCenter(contour_approx, contourCenter(contour_approx), 50)
+            contour_scaled = scalePointsFromCenter(contour_approx, contourCenter(contour_approx), 7/scalingFactor)
             
-            listContour.append(contour_approx[:,0,:])
-            cv2.drawContours(img, contour_approx, -1, (0,0,255), 10)
+            listContour.append(contour_scaled[:,0,:])
+            cv2.drawContours(img, contour_scaled, -1, (0,0,255), 10)
     else:
         print("No contour found")
     

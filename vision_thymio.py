@@ -108,7 +108,9 @@ class Vision_Thymio(object):
                 scalingFactor = height_roi/hmax
             else:
                 transformMatrix = []
+                
                 print("Can't find markers 3, 4, 5 and 6 for perspective transformation")
+                print("Found ids", ids)
 
         self.transformMatrix, self.sizeROI, self.scalingFactor = transformMatrix, sizeROI, scalingFactor
 
@@ -181,7 +183,7 @@ class Vision_Thymio(object):
         
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             
-        frame, contourList = gn.drawSimplifiedContours(contours, img)
+        frame, contourList = gn.drawSimplifiedContours(contours, img, self.scalingFactor)
         
         # AG - commented to be used in jupyter notebook
         cv2.imshow("ContourList",frame)
