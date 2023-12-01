@@ -43,7 +43,7 @@ class Local_Navigation(object):
     
   def control(self, pose, sensor_data):
     if self.present_obstacle(sensor_data):
-      self.obstacle_counter = 5
+      self.obstacle_counter = 7
 
     if self.obstacle_counter > 0 :
       if not self.present_obstacle(sensor_data):
