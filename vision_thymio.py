@@ -186,27 +186,28 @@ class Vision_Thymio(object):
         frame, contourList = gn.drawSimplifiedContours(contours, img, self.scalingFactor)
         
         # AG - commented to be used in jupyter notebook
-        cv2.imshow("ContourList",frame)
+        #cv2.imshow("ContourList",frame)
         #while True:
         #    if cv2.waitKey(1) & 0xFF == ord('q'):
         #        break
         #cv2.destroyAllWindows()
 
 
-        return contourList
+        return contourList, frame
 
-    def getOptimalPath(self, start, staticObstacleList, goal):
+    def getOptimalPath(self, start, staticObstacleList, goal, img):
         path = []
                 
         staticObstacleList = gn.addStartAndGoal(staticObstacleList, start, goal, self.scalingFactor)
 
         path = gn.findShortestPath(contourList = staticObstacleList)
         
+        # AG - adapt it to be run in jupyter notebook
+        for i in range(len(path)-1):
+            img = cv2.line(img, path[i, :].astype(int), path[i+1, :].astype(int), color=(0, 0, 255), thickness=2)
+        print('test')
+
         path = path * self.scalingFactor
 
-        # AG - adapt it to be run in jupyter notebook
-        #for i in range(len(path)-1):
-        #    img = cv2.line(img, path[i, :], path[i+1, :], color=(0, 0, 255), thickness=2)
-        
-        return path #*self.scalingFactor
+        return path, img #*self.scalingFactor
 
