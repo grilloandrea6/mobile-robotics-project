@@ -49,7 +49,8 @@ class Local_Navigation(object):
       if not self.present_obstacle(sensor_data):
         self.obstacle_counter -= 1
 
-      return (0,0), self.obst_avoid(sensor_data), False
+      wl,wr = self.obst_avoid(sensor_data)
+      return self.inv_differential_steering(wl,wr), (wl,wr), False
       
     else :
       v,w = self.path_follow(pose)
@@ -101,6 +102,13 @@ class Local_Navigation(object):
     wr = CONV_RATIO * (2*v + w*L)/(2*R) # right motor speed
     
     return int(wl), int(wr)
+
+  def inv_differential_steering(self, wl, wr):
+    wl_ = wl * 2 * R / CONV_RATIO
+    wr_ = wr * 2 * R / CONV_RATIO
+    w = (wr_ - wl_) / (2 * L)
+    v = (wl_ + wr_) / 4
+    return v, w
 
   def dist(self,a,b):
     return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
