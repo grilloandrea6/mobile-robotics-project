@@ -193,6 +193,17 @@ We can implement that in pyhon as:
         self._angle_modulus()
 ```
 
+### Tuning Covariance Matrices
+
+To tune the measurement covariance matrix, we used the measured speed values when motor is commanded to run at a fixed speeds. You can see the distributions of the wheel speed measurements for different speeds.
+
+<center><div><img src = "images\wheel_speed_distribution.png" width = 350></div></center>
+
+To find the wheel speed sensor noise covariance matrix, the following error distribution is used.
+
+<center><div><img src = "images\measurement_error_distribution.png" width = 350></div></center>
+
+We have found the camera noise covariance matrix in a similar way. Lastly, process noise covariance matrix is tuned by trial and error to get an optimal behaviour.
 
 ## 4. Local Navigation
 The goal of the Local Navigation submodule is to make the Thymio follow the path computed by the Global Navigation part, while making the Thymio avoid dynamic obstacles that can be placed along the path.
