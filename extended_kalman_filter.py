@@ -1,7 +1,7 @@
 import numpy as np
 
 PROCESS_NOISE_COV =  np.eye(5) * 0.0001  # Adjust the covariance based on your system dynamics
-CAMERA_NOISE_COV = np.eye(3) * 0.0001
+CAMERA_NOISE_COV = np.eye(3) * 0.00001
 CAMERA_COVERED_COV = np.eye(3) * 99999999
 # SPEED_NOISE_COV = np.array([[373.6623, 103.2730], [103.2730, 189.5869]])
 SPEED_NOISE_COV = np.eye(2)*500
