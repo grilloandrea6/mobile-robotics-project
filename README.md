@@ -110,6 +110,37 @@ F =
 \end{bmatrix}
 $$
 
+State transition can be implemented as:
+```py
+    def _state_transition(self, x, u, dt):
+        # State transition function for a differential drive robot
+        v_bar,omega = u
+
+        x_new = x[0] + v_bar * dt * np.cos(x[2])
+        y_new = x[1] + v_bar * dt * np.sin(x[2])
+        theta_new = x[2] + omega * dt
+
+        return np.array([x_new, y_new, theta_new, v_bar, omega])
+
+    def _calculate_state_transition_matrix(self, x, u, dt):
+        # Jacobian matrix A of the state transition function
+
+        v_bar,omega = u
+        #v_right, v_left = u
+        #v_bar = (v_right + v_left) / 2.0
+        theta_i = x[2]
+
+        A = np.array([
+            [1, 0, -v_bar * dt * np.sin(theta_i), 0, 0],
+            [0, 1, v_bar * dt * np.cos(theta_i), 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 1]
+        ])
+
+        return A
+```
+
 Measurement model:
 $$
 h(x_i) = 
@@ -133,6 +164,20 @@ H =
 0 & 0 & 0 & 0 & 1
 \end{bmatrix}
 $$
+
+Measurement model can be implemented as:
+```py
+    def _measurement_model(self, x):
+        # x, y, and theta are measured usıng the camera
+        # v_right and v_left are measured using velocity sensors
+        return x
+
+    def _calculate_measurement_jacobian(self, x):
+        # Calculate the Jacobian matrix H of the measurement model
+        H = np.eye(5)
+
+        return H
+```
 
 ### Prediction Step
 $$
