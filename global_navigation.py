@@ -33,24 +33,24 @@ def contourCenter(contour):
     center = [cX, cY]
     return center
 
-def getLength(p1, p2):
-    length = dist(p1, p2)
-    return length
-
-def getDilatationScale(d1, d2):
-    return d1/d2
-
-def scalePointsFromCenter(points, center, length):
+def scalePointsFromCenter(points, length):
     for p in range(points.shape[0]):
-        distCenter = getLength(center, [points[p,0,0], points[p,0,1]])
-        scale = getDilatationScale(distCenter+length, distCenter)
         
-        # Translate to center
-        points[p, 0, :] = points[p, 0, :] - center 
-        # Scale
-        points[p, 0, :] = points[p,0,:]*scale
-        # Translate back to center
-        points[p, 0, :] = points[p, 0, :] + center
+        scalingDirection = np.array([0,0])
+
+        if p == points.shape[0]-1:
+            vect1 = (points[p, 0, :]- points[0, 0, :])/np.linalg.norm((points[p, 0, :]- points[0, 0, :]),2)
+            vect2 = (points[p, 0, :]- points[p-1, 0, :])/np.linalg.norm((points[p, 0, :]- points[p-1, 0, :]))
+            scalingDirection = vect1 + vect2
+
+        else:
+            vect1 = (points[p, 0, :]- points[p+1, 0, :])/np.linalg.norm((points[p, 0, :]- points[p+1, 0, :]),2)
+            vect2 = (points[p, 0, :]- points[p-1, 0, :])/np.linalg.norm((points[p, 0, :]- points[p-1, 0, :]))
+            scalingDirection = vect1 + vect2
+        
+        scalingDirection = scalingDirection/np.linalg.norm(scalingDirection,2)
+        points[p, 0, :] = points[p,0,:] + (scalingDirection*length).astype(int)
+
     return points
 
 def drawSimplifiedContours(contours, img, scalingFactor):
