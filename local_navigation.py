@@ -18,17 +18,19 @@ L = 105
 CONV_RATIO = 2
 
 # controller proportional constant for angular velocity
-KP_ALPHA = .6
+KP_ALPHA = .55
 
 # weights for obstacle avoidance using proximity sensors
-WEIGHT_LEFT = [ 6,  8.5, -9.5,  -8.5, -6]
-WEIGHTRIGHT = [-6, -8.5, -12, 8.5,  6]
+WEIGHT_LEFT = [ 6,  9, -10,  -9, -6]
+WEIGHT_RIGHT = [-6, -8.5, -12.5, 9,  6]
 
 # base speed of the obstacle avoidance
 VEL_OBST_AVOID = 115
 
 # scale factors for proximity sensors
 SENSOR_SCALE = 250
+
+OBSTACLE_COUNTER = 7
 
 # END CONSTANT DEFINITION
 
@@ -43,7 +45,7 @@ class Local_Navigation(object):
     
   def control(self, pose, sensor_data):
     if self.present_obstacle(sensor_data):
-      self.obstacle_counter = 5
+      self.obstacle_counter = OBSTACLE_COUNTER
 
     if self.obstacle_counter > 0 :
       if not self.present_obstacle(sensor_data):

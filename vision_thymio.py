@@ -6,9 +6,9 @@ import math
 ### Markers detection functions
 class Vision_Thymio(object):
 
-    def __init__(self):
+    def __init__(self, camera_index):
         print("Init Vision Thymio")
-        self.cap = self.startVideoCapture()
+        self.cap = self.startVideoCapture(camera_index)
         self.dict = self.initDictAruco()
     
     # We use IDs: 
@@ -116,9 +116,10 @@ class Vision_Thymio(object):
 
     def getCorrectedImage(self):
         img = self.getFrame()
+        origImg = img
         img = cv2.warpPerspective(img, self.transformMatrix ,(self.sizeROI[1], self.sizeROI[0]),flags=cv2.INTER_LINEAR)
 
-        return img
+        return img, origImg
         
    
     def getGoalPosition(self, ids, corners):    
@@ -165,8 +166,8 @@ class Vision_Thymio(object):
 
     # ========================================================
 
-    def startVideoCapture(self):
-        cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    def startVideoCapture(self,camera_index):
+        cap = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW)
         cap.set(3,854)
         cap.set(4,480)
         return cap
@@ -205,7 +206,6 @@ class Vision_Thymio(object):
         # AG - adapt it to be run in jupyter notebook
         for i in range(len(path)-1):
             img = cv2.line(img, path[i, :].astype(int), path[i+1, :].astype(int), color=(0, 0, 255), thickness=2)
-        print('test')
 
         path = path * self.scalingFactor
 

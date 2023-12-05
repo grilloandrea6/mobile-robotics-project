@@ -3,6 +3,8 @@ import cv2
 from math import dist
 import pyvisgraph as vg
 
+BIG_VALUE = 100000
+
 def prepareImage(frame, threshold = 100):
     kernel = np.ones((2,2),np.uint8)
 
@@ -68,7 +70,27 @@ def drawSimplifiedContours(contours, img, scalingFactor):
             contour_approx = approx_contour(cont)
             
             # There's a problem with the center calculation
-            contour_scaled = scalePointsFromCenter(contour_approx, contourCenter(contour_approx), 10/scalingFactor)
+            contour_scaled = scalePointsFromCenter(contour_approx, 11.5/scalingFactor)
+            for point in contour_scaled:
+                print("testing point ", point[0,0], point[0,1])
+                y_max = img.shape[1]
+                x_max = img.shape[0]
+
+                if point[0, 0] > y_max:
+                    print("big >y")
+                    point[0,0] = BIG_VALUE
+                elif point[0,0] < 0:
+                    print("big <y")
+                    point[0,0] = -BIG_VALUE
+                
+                if point[0,1] > x_max:
+                    print("big >x")
+                    point[0,1] = BIG_VALUE
+                elif point[0,1] < 0: 
+                    print("big <x")
+                    point[0,1] = -BIG_VALUE
+                print("testing point ", point[0,0], point[0,1])
+
             
             listContour.append(contour_scaled[:,0,:])
             cv2.drawContours(img, contour_scaled, -1, (0,0,255), 10)
