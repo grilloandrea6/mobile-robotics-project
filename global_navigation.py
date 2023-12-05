@@ -68,7 +68,7 @@ def drawSimplifiedContours(contours, img, scalingFactor):
             contour_approx = approx_contour(cont)
             
             # There's a problem with the center calculation
-            contour_scaled = scalePointsFromCenter(contour_approx, contourCenter(contour_approx), 7/scalingFactor)
+            contour_scaled = scalePointsFromCenter(contour_approx, contourCenter(contour_approx), 10/scalingFactor)
             
             listContour.append(contour_scaled[:,0,:])
             cv2.drawContours(img, contour_scaled, -1, (0,0,255), 10)
