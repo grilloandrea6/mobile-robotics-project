@@ -8,6 +8,10 @@ Badil Mujovi (274632)\
 Aubin Mercier (316260)\
 Mehmet Furkan Dogan (370234)\
 Andrea Grillo (371099)
+
+# Demonstration
+<center><div><img src = "images\demonstration.gif" width = 350></div></center>
+
 ## Introduction
 This project aims to combine vision, global and local navigation, and filtering to maneuver a Thymio robot in a predetermined environment.
 
@@ -70,9 +74,6 @@ $$
 $$
 u = 
 \begin{bmatrix}
-x_{\textrm{camera}}\\
-y_{\textrm{camera}}\\
-\theta_{\textrm{camera}}\\
 \bar{v}_{\textrm{sensor}}\\
 \omega_{\textrm{sensor}}
 \end{bmatrix}
