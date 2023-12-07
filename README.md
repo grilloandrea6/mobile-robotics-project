@@ -362,10 +362,11 @@ The controller chosen is a simple proportional controller for the $ \omega $, an
 
 The control law is therefore:
 $$ v = v_{fixed} $$
-$$ \omega = K_p ( \theta - \gamma) $$
+$$ \alpha = \gamma - \theta $$
+$$ \omega = K_p \cdot \alpha $$
 where $ \theta $ is the orientation of the Thymio and $ \gamma $ is the angle of the vector connecting the Thymio to the waypoint. 
 
-### TODO INSERT IMAGE of the angles
+<center><div><img src = "images\scheme.png" width = 500></div></center>
 
 The routine checks if the waypoint has been reached, by checking that the actual pose is within a distance $ \epsilon $ of the waypoint. If the condition is true, the `waypoint_counter` variable is incremented and the function is called recursively, until the last goal is reached.
 
