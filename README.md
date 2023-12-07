@@ -44,7 +44,8 @@ The main code of the system is implemented in this Jupyter noteboook. The submod
 
 
 Some scripts for testing the subsystems have been written, and they are located under the 'test' directory.
-Moreover, for the estimation for the variance matrices for the Kalman Filter, measurements and subsequent data analysis in Matlab have been conducted. All the files related to this part can be found in the 'Sensor Noise Measurement' directory.
+Moreover, for the estimation for the variance matrices for the Kalman Filter, measurements and subsequent data analysis in Matlab have been conducted. All the files related to this part can be found in the 'Sensor Noise Measurement' directory. 
+In the 'camera calibration' directory you will find all the files used for the calibration of the camera.
 
 Below there is an explanation of each submodule, followed by the explanation of the main loop of the code.
 
