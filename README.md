@@ -152,17 +152,22 @@ The goal of the filtering submodule is to to the sensor fusion between the data 
 To estimate the position and oritentation of a differential drive robot for the next timestep, following simplified discrete time state space model can be used assuming a sufficiently small timestep.
 
 $$
-x_{i+1} = x_i + \bar{v}_i \cdot \Delta t \cdot \cos(\theta_i)\\
-y_{i+1} = y_i + \bar{v}_i \cdot \Delta t \cdot \cos(\theta_i)\\
-\theta_{i+1} = \theta_i + \omega_i \cdot \Delta t
+\begin{align*}
+x_{i+1} &= x_i + \bar{v}_i \cdot \Delta t \cdot \cos(\theta_i)\\
+y_{i+1} &= y_i + \bar{v}_i \cdot \Delta t \cdot \cos(\theta_i)\\
+\theta_{i+1} &= \theta_i + \omega_i \cdot \Delta t
+\end{align*}
 $$
 
 Since the model that we have chosen is nonlinear with respect to the orientation of the robot, standard Kalman filter formulation İs not sufficient. For this reason, we used the Extended Kalman Filter model.
 ### Extended Kalman Filter Model
 We are using the following model for extended Kalman filter implementation:
+
 $$
-x_{i+1} = f(x_i,u_i) + w\\
-z_{i+1} = h(x_i) + v
+\begin{align*}
+x_{i+1} &= f(x_i,u_i) + w\\
+z_{i+1} &= h(x_i) + v
+\end{align*}
 $$
 
 where:
@@ -179,14 +184,17 @@ y\\
 $$
 
 $$
+\begin{equation*}
 u = 
 \begin{bmatrix}
 \bar{v}_{\textrm{sensor}}\\
 \omega_{\textrm{sensor}}
 \end{bmatrix}
+\end{equation*}
 $$
 
 State transition model:
+
 $$
 f(x_i,u_i) = 
 \begin{bmatrix}
@@ -198,7 +206,7 @@ y_{i+1}\\
 \end{bmatrix} = 
 \begin{bmatrix}
 x_i + \bar{v}_i \cdot \Delta t \cdot \cos(\theta_i)\\
-y_i + \bar{v}_i \cdot \Delta t \cdot \cos(\theta_i)\\
+y_i + \bar{v}_i \cdot \Delta t \cdot \sin(\theta_i)\\
 \theta_i + \omega_i \cdot \Delta t\\
 \bar{v}_{\textrm{sensor}}\\
 \omega_{\textrm{sensor}}
@@ -250,6 +258,7 @@ State transition can be implemented as:
 ```
 
 Measurement model:
+
 $$
 h(x_i) = 
 \begin{bmatrix}
@@ -262,6 +271,7 @@ y_{\textrm{camera}}\\
 $$
 
 Measurement jacobian:
+
 $$
 H = 
 \begin{bmatrix}
@@ -288,12 +298,15 @@ Measurement model can be implemented as:
 ```
 
 ### Prediction Step
+
 $$
 x_{i+1} = f(x_i,u_i)
 $$
+
 $$
 P = F \cdot P \cdot F^T + Q
 $$
+
 where $P$ is the error covariance matrix and Q is the process noise covariance matrix. We can implement that in pyhon as:
 
 ```py
@@ -310,18 +323,25 @@ where $P$ is the error covariance matrix and Q is the process noise covariance m
 
 ### Update Step
 Innovation covariance matrix can be calculated as:
+
 $$
 S = H \cdot P \cdot H^T + R
 $$
+
 Optimal Kalman gain can be calculated as:
+
 $$
 K = P \cdot H^T \cdot S^{-1}
 $$
+
 Updated state estimate:
+
 $$
 x_{i+1} = x_i + K \cdot (z_i - H_i \cdot x_i)
 $$
+
 Updated error covariance:
+
 $$
 P = (I - K\cdot H)\cdot P
 $$
