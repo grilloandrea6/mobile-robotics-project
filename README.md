@@ -143,6 +143,7 @@ The code used to do the simulation can be found inside the `test` directory, in 
 
 ## 3. Filtering
 The goal of the filtering submodule is to to the sensor fusion between the data coming from the computer vision and the odometry obtained from the Thymio. The system ensure that in the case that the camera is not a reliable source of data for the positioning of the robot (camera covered, malfunctioning of the computer vision submodule) the system can continue to work.
+
 The model that we have chosen is not linear, so the standard Kalman filter formulation was not sufficient. For this reason, we used the Extended Kalman Filter model.
 ### Extended Kalman Filter Model
 We are using the following model for extended Kalman filter implementation:
