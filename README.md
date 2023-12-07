@@ -151,13 +151,13 @@ The goal of the filtering submodule is to to the sensor fusion between the data 
 
 To estimate the position and oritentation of a differential drive robot for the next timestep, following simplified discrete time state space model can be used assuming a sufficiently small timestep.
 
-```math
+$$
 \begin{align*}
 x_{i+1} &= x_i + \bar{v}_i \cdot \Delta t \cdot \cos(\theta_i)\\
 y_{i+1} &= y_i + \bar{v}_i \cdot \Delta t \cdot \cos(\theta_i)\\
 \theta_{i+1} &= \theta_i + \omega_i \cdot \Delta t
 \end{align*}
-```
+$$
 
 Since the model that we have chosen is nonlinear with respect to the orientation of the robot, standard Kalman filter formulation İs not sufficient. For this reason, we used the Extended Kalman Filter model.
 ### Extended Kalman Filter Model
@@ -183,7 +183,7 @@ y\\
 \end{bmatrix}
 $$
 
-```math
+$$
 \begin{equation*}
 u = 
 \begin{bmatrix}
@@ -191,11 +191,11 @@ u =
 \omega_{\textrm{sensor}}
 \end{bmatrix}
 \end{equation*}
-```
+$$
 
 State transition model:
 
-```math
+$$
 f(x_i,u_i) = 
 \begin{bmatrix}
 x_{i+1}\\
@@ -211,7 +211,7 @@ y_i + \bar{v}_i \cdot \Delta t \cdot \sin(\theta_i)\\
 \bar{v}_{\textrm{sensor}}\\
 \omega_{\textrm{sensor}}
 \end{bmatrix}
-```
+$$
 
 State transition matrix can be found by calculating the Jacobian of the nonlinear state transition model.
 
@@ -259,7 +259,7 @@ State transition can be implemented as:
 
 Measurement model:
 
-```math
+$$
 h(x_i) = 
 \begin{bmatrix}
 x_{\textrm{camera}}\\
@@ -268,11 +268,11 @@ y_{\textrm{camera}}\\
 \bar{v}_{\textrm{sensor}}\\
 \omega_{\textrm{sensor}}
 \end{bmatrix}
-```
+$$
 
 Measurement jacobian:
 
-```math
+$$
 H = 
 \begin{bmatrix}
 1 & 0 & 0 & 0 & 0\\
@@ -281,7 +281,7 @@ H =
 0 & 0 & 0 & 1 & 0\\
 0 & 0 & 0 & 0 & 1
 \end{bmatrix}
-```
+$$
 
 Measurement model can be implemented as:
 ```py
