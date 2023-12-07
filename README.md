@@ -9,8 +9,13 @@ Aubin Mercier (316260) - First year MSc in Robotics, previously did a BSc at EPF
 Mehmet Furkan Dogan (370234)\
 Andrea Grillo (371099) - First year MSc in Robotics, coming for a BSc in Computer Science at Politecnico di Torino
 
+
 # Demonstration
+Here you can see a demo of all the components of the project:
+
 <center><div><img src = "images\demonstration.gif" width = 350></div></center>
+
+In the 'videos' directory, you can find other videos of the tests that we have run.
 
 ## Introduction
 This project aims to combine vision, global and local navigation, and filtering to maneuver a Thymio robot in a predetermined environment.
