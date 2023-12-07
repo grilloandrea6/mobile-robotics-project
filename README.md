@@ -7,7 +7,7 @@ Project for the EPFL course Basics of Mobile Robotics.
 Badil Mujovi (274632) - Currently in Robotics, previously did a Bachelor at HEIG-VD in Microengineering \
 Aubin Mercier (316260)\
 Mehmet Furkan Dogan (370234)\
-Andrea Grillo (371099)
+Andrea Grillo (371099) - First year MSc in Robotics, coming for a BSc in Computer Science at Politecnico di Torino \
 
 # Demonstration
 <center><div><img src = "images\demonstration.gif" width = 350></div></center>
@@ -98,7 +98,7 @@ This method also gives us a scaling value in $cm/px$ to compute the real distanc
 
 ## 2. Path Planning
 <a id='section_id'></a>
-This part of the project is focused on the global navigation and optimal path finding and, if not mentionned otherwise, the functions used can be found in the global_navigation.py file. The path finding is done in three parts : the vision needed to find the static obstacles, the creation of the visibility graph and the computing of the optimal path. We use the following image as an example instead of a camera feed to showcase the steps for the global navigation :
+This part of the project is focused on the global navigation and optimal path finding and, if not mentioned otherwise, the functions used can be found in the global_navigation.py file. The path finding is done in three parts : the vision needed to find the static obstacles, the creation of the visibility graph and the computing of the optimal path. We use the following image as an example instead of a camera feed to showcase the steps for the global navigation :
 <center><div><img src = "images\shapes.png" width = 500></div></center>
 
 ### Vision for the obstacles
@@ -142,6 +142,8 @@ The PyVisGraph module has a <code>shortest_path()</code> method in the <code>Vis
 The code used to do the simulation can be found inside the `test` directory, in the `global_navigation_test.py` file.
 
 ## 3. Filtering
+The goal of the filtering submodule is to to the sensor fusion between the data coming from the computer vision and the odometry obtained from the Thymio. The system ensure that in the case that the camera is not a reliable source of data for the positioning of the robot (camera covered, malfunctioning of the computer vision submodule) the system can continue to work.
+The model that we have chosen is not linear, so the standard Kalman filter formulation was not sufficient. For this reason, we used the Extended Kalman Filter model.
 ### Extended Kalman Filter Model
 We are using the following model for extended Kalman filter implementation:
 $$
@@ -349,7 +351,7 @@ The path is given as a list of tuples (x,y) representing the waypoints of the pa
 
 #### Control routine
 The function which is called at every loop iteration is `control`, whose role is to decide whether to apply the controller to follow the path or the local avoidance routine.
-The system starts in the <i>path_follow</i> modality, which is changed to <i>obstacle_avoidance</i> whenever the proximity sensor detect an obstacle. When no obstacle is detected anymore, the obstacle avoidance routine will be run for the following 5 loop cycles before going back to the <i>path_follow</i> mode, to ensure that the obstacle is really been overcome and that the Thymio is far enough from it.
+The system starts in the <i>path_follow</i> modality, which is changed to <i>obstacle_avoidance</i> whenever the proximity sensor detect an obstacle. When no obstacle is detected anymore, the obstacle avoidance routine will be run for the following 7 loop cycles before going back to the <i>path_follow</i> mode, to ensure that the obstacle is really been overcome and that the Thymio is far enough from it.
 
 
 #### Obstacle avoidance routine
