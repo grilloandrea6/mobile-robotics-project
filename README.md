@@ -430,10 +430,15 @@ The result of the simulation can be seen in the graph below:
 
 The code used to do the simulation can be found inside the `test` directory, in the `local_navigation_test.py` file.
 
+## 5. Main loop 
+The main module is the code written at the end of this Jupyter Notebook. 
+
+Before actually writing the code, we planned the flow of the main loop operations, which is described in the following flowchart:
+<center><div><img src = "images\flowchart project.png" width = 500></div></center>
 
 ## Conclusion
 
-Incorporating OpenCV, we calibrated the camera, detected ArUco markers for localization, and applied perspective transformation for real-world mapping. Despite successes in accurate positioning, contour detection presented challenges, impacting precision. Nevertheless, our computer vision framework established the foundation for our robot's environment perception within the navigation system.
+Incorporating OpenCV, we calibrated the camera, detected ArUco markers for localization, and applied perspective transformation on the live camera feed. Despite successes in accurate positioning, contour detection presented challenges, which were solved successfully. Nevertheless, our computer vision framework established the foundation for our robot's environment perception within the navigation system.
 
 Our path planning strategy covered obstacle detection through image processing, visibility graph creation using simplified obstacle contours, and computing an optimal path via Dijkstra's algorithm. The path was calculated with respect to obstacles, ensuring effective navigation.
 
@@ -444,3 +449,14 @@ The local navigation submodule skillfully combined path following and obstacle a
 Our system encapsulates various modules harmoniously, leveraging computer vision for environment mapping, path planning for efficient navigation, filtering for robustness against sensor issues, and local navigation for adaptable real-time movement. Despite its comprehensive nature, potential challenges lie in tuning parameters for optimal performance across diverse scenarios and accounting for latency in the obstacle avoidance routine, especially when integrated into a physical Thymio.
 
 We've achieved a versatile robotics system, but continuous optimization and real-world testing remain essential for enhancing its adaptability and reliability in dynamic environments.
+
+## Limits of our system and possible improvements
+We have built a system that works well in a predefined environment, with strict conditions. We have had the possibility to see the limits of our system, that are related to those conditions and also things that may be improved.
+
+We used ArUco markers to define the field, which is something that is hardly applicable to real world applications. Our system is also sensitive to the lighting conditions, which is something that is hard to control in a real world application. Moreover, we used black polygons as our obstacles, and we need them to be convex to run our visibility graph generation, which is another limitation. If the obstacles are too close to each other, when we do the dilation of the graph nodes, they overlap and the system does not handle this, an improvement to this would be to merge the obstacles with a bigger dilation and make them overlap.
+
+In the local navigation part, one of the limits is the fact that when we switch to obstacle avoidance mode, as the static obstacles are 2D, the robot does not know if it goes over one of the static obstacles. 
+Another limit of the obstacle avoidance mode, is that if the obstacle is placed too close to one of the waypoints of the optimal path, the Thymio enters a cycle in which it tries to reach the point while avoiding the obstacle.
+We encountered some problems with the avoidance of local obstacles with non-regular shapes with the available sensors. Also, the absence of a lateral sensor makes the local navigation more difficult. 
+
+Regarding the pose estimation aspect, if the camera is covered and there is slippage of a wheel of the Thymio, the Kalman estimation loses its precision. To solve this problem, data from other sensors can be incorporated, such as an IMU, which is present on the Thymio.
