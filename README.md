@@ -7,7 +7,7 @@ Project for the EPFL course Basics of Mobile Robotics.
 Badil Mujovi (274632) - First year MSc in Robotics, previously did a Bachelor at HEIG-VD in Microengineering \
 Aubin Mercier (316260) - First year MSc in Robotics, previously did a BSc at EPFL in Microengineering\
 Mehmet Furkan Dogan (370234) - First year MSc in Mechanical Engineering, previously did a BSc in Mechanical Engineering and Mechatronics at Middle East Technical University\
-Andrea Grillo (371099) - First year MSc in Robotics, coming for a BSc in Computer Science at Politecnico di Torino
+Andrea Grillo (371099) - First year MSc in Robotics, previously did a BSc in Computer Science at Politecnico di Torino
 
 
 # Demonstration
