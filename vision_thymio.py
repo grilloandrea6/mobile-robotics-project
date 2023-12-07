@@ -165,6 +165,7 @@ class Vision_Thymio(object):
 
     # ========================================================
 
+    # Used to control the camera feed
     def startVideoCapture(self,camera_index):
         cap = cv2.VideoCapture(camera_index, cv2.CAP_DSHOW)
         cap.set(3,854)
@@ -186,6 +187,7 @@ class Vision_Thymio(object):
 
         return contourList, frame
 
+    # Returns the optimal path as an array and draws it on the image
     def getOptimalPath(self, start, staticObstacleList, goal, img):
         path = []
                 
