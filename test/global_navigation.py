@@ -55,8 +55,7 @@ def scalePoints(points, length):
 
     return points
 
-# Delete unnecessary points from contour and scale it to take Thymio's
-# size into account
+
 def drawSimplifiedContours(contours, img, scalingFactor):
     listContour = list()
     if len(contours) > 0:
@@ -71,7 +70,7 @@ def drawSimplifiedContours(contours, img, scalingFactor):
             # Approximation on contour into few points and scaling of those points
             contour_approx = approx_contour(cont)
             
-            contour_scaled = scalePoints(contour_approx, 11.5/scalingFactor)
+            contour_scaled = scalePoints(contour_approx, scalingFactor)
 
             # All the points that have been scaled outside of the ROI are given
             # a big value so that the optimal path finding does not consider them
@@ -108,12 +107,13 @@ def addStartAndGoal(contourList, start, goal, scalingFactor):
     #print(contourList)
     return contourList
 
-# Finds the shortest path using Djikstra's algorithm
+
 def findShortestPath(contourList):
     polyList = list()
     poly = list()   
     
-    # Create the list of points to be used for visibility graph.
+    # Create the list of points to 
+    # be used for visibility graph.
     # The obstacles are considered to be polygons.
     for obstacle in contourList[:]:
         polyList = list()

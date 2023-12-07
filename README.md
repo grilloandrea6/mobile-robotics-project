@@ -47,7 +47,7 @@ The computer vision used for this project is composed of many parts, such as the
 ### Distortion correction and camera calibration
 Before doing any image processing, the camera had to be calibrated to take into account the possible distortion stemming from the optical components of the camera. This calibration has been done following this [OpenCV guide](https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html).
 
-Two set of values are needed to get an undistorted and corrected picture from the camera : the first being the camera matrix and the second the distortion matrix. These two matrices can be obtained by taking pictures of a ChAruco board at different angles. These matrices are of the following form :
+Two set of values are needed to get an undistorted and corrected picture from the camera : the first being the camera matrix and the second the distortion matrix. These two matrices can be obtained by taking pictures of a ChAruco board at different angles and are of the following form :
 $$
 M = 
 \left( \begin{matrix}
@@ -83,99 +83,25 @@ def getFrame(self):
     x, y, w, h = roi
     dst = dst[y:y+h, x:x+w]
     return dst
-
 ```
 
 ### Aruco markers detection
-OpenCV has a module to detect Aruco markers which, in our case, are used to detect the border of our working space as well as the positions and orientations of the Thymio and the goal. This detection is done with the <code>cv2.detectMarkers()</code> method. What OpenCV does is that it applies an adaptive thresholding and finds the contours that could be square shapes. Then it does a perspective transformation on each square shapes to check if there is a binary code corresponding to an ID from the dictionnary used. The method simply returns the IDs found and the corners of each marker. The following method in the <code>Vision_Thymio</code> class give us the markers IDs and corners :
-```py
-    
-def initDictAruco(self,type = cv2.aruco.DICT_4X4_50):
-    dict = cv2.aruco.getPredefinedDictionary(type)
-    return dict
+OpenCV has a module to detect Aruco markers which, in our case, are used to detect the border of our working space as well as the positions and orientations of the Thymio and the goal. This detection is done with the <code>cv2.detectMarkers()</code> method. What OpenCV does is that it applies an adaptive thresholding and finds the contours that could be square shapes. Then it does a perspective transformation on each square shapes to check if there is a binary code corresponding to an ID from the aruco dictionnary used. The method simply returns the IDs found and the corners of each marker. The <code>initDictAruco()</code> and <code>detectArucoMarkers()</code> methods in the <code>Vision_Thymio</code> class give us the markers IDs and corners.
 
-def detectArucoMarkers(self, img):
-    marker_ids = []
-    corners = []
-    
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # Corners are returned in clockwise order starting with top left
-    corners, ids, _ = cv2.aruco.detectMarkers(image=img, dictionary=self.dict)
-    
-    if len(corners) != 0:
-        for i in range(len(ids)):
-            marker_ids.append(ids[i][0])
-
-    return marker_ids, corners
-```
-In our case, the markers with IDs 1 and 2 corresponds respectively to the thymio and the goal. The markers with IDs from 3 to 6 give us the corners of our working ROI. The positions of the goal and the Thymio are given by finding the mean value of their corresponding marker's corners. As for the orientation of the Thymio, it is found by taking the vector given by two corners (which are always returned in a specific order). The methods to find these values are <code>getGoalPosition</code> and <code>getGoalPosition</code>.
+In our case, the markers with IDs 1 and 2 corresponds respectively to the thymio and the goal. The markers with IDs from 3 to 6 give us the corners of our working ROI. The positions of the goal and the Thymio are given by finding the mean value of their corresponding marker's corners. As for the orientation of the Thymio, it is found by taking the vector given by two corners (which are always returned in a specific order). The methods to find these values are <code>getGoalPosition</code> and <code>getGoalPosition</code>. We decided to use this method simply because it is reliable and already implemented in OpenCV
 
 ### Perspective transformation
-For our work, we need to find the position of the thymio, the goal and the obstacles with respect to our marked zone. To do that, we find the Arcuo markers of our ROI and get the position of their inner corners. Then, by using the <code>cv2.getPerspectiveTransform()</code> method, we can map this ROI into a new image with corrected perspective and get a transformation matrix. In our case, we measured the size of our ROI in centimeters, which let us get an image with the same aspect ratio. The following method in the <code>Vision_Thymio</code> class gives us the desired result :
-```py
-def getPerspectiveAndScaling(self, width_roi=48.4, height_roi=31):
-    
-    # Need to measure the size of the ROI in real life
-    ratio_vh = width_roi/height_roi
-    transformMatrix = []
-    
-    # loops until good transform matrix found 
-    while len(transformMatrix) == 0:
-        _ , img = self.cap.read()
-        ids, corners = self.detectArucoMarkers(img)
-        wmax = 0
-        hmax = 0
-        
-        if ids != [] and (3 in ids) and (4 in ids) and (5 in ids) and (6 in ids):
-            
-            # Take the points of each marker closest to ROI
-            mark4 = corners[ids.index(4)][0]
-            mark3 = corners[ids.index(3)][0]
-            mark5 = corners[ids.index(5)][0]
-            mark6 = corners[ids.index(6)][0]
-            
-            pointA = mark4[2,:]
-            pointB = mark3[1,:]
-            pointC = mark5[0,:]
-            pointD = mark6[3,:]
+For our work, we need to find the position of the thymio, the goal and the obstacles with respect to our ROI. To do that, we find the Arcuo markers of our ROI and get the position of their inner corners. Then, by using the <code>cv2.getPerspectiveTransform()</code> method, we can map this ROI into a new image with corrected perspective and get a transformation matrix. In our case, we measured the size of our ROI in centimeters, which let us get an image with the same aspect ratio. The <code>getPerspectiveAndScaling()</code> method in the <code>Vision_Thymio</code> class gives us the desired result.
 
-            # Previous ROI
-            inputPoints = np.array([pointA, pointB, pointC, pointD],np.float32)
-            
-            # Dimensions of new ROI with same aspect ratio
-            hmax = img.shape[1]
-            wmax = hmax*ratio_vh
-            
-            # New ROI
-            outputPoints = np.array([[0, 0],
-                            [0, hmax],
-                            [wmax, hmax],
-                            [wmax, 0]], np.float32)
-
-            transformMatrix = cv2.getPerspectiveTransform(inputPoints, outputPoints)
-            
-            sizeROI = np.array([hmax, wmax]).astype(int)
-            
-            scalingFactor = height_roi/hmax
-        else:
-            transformMatrix = []
-            
-            print("Can't find markers 3, 4, 5 and 6 for perspective transformation")
-            print("Found ids", ids)
-
-    self.transformMatrix, self.sizeROI, self.scalingFactor = transformMatrix, sizeROI, scalingFactor
-```
-This method also gives us a scaling value in $cm/px$ to compute the real distances obtained later. We then used the <code>getCorrectedImage()</code> method from the <code>Vision_Thymio</code> class to get the transformed image.
+This method also gives us a scaling value in $cm/px$ to compute the real distances of each points. We then used the <code>getCorrectedImage()</code> method from the <code>Vision_Thymio</code> class to get the transformed image. An example code can't be given for this part as it would depend heavily on the detection of the aruco markers as we intended.
 
 ## 2. Path Planning
 <a id='section_id'></a>
 This part of the project is focused on the global navigation and optimal path finding and, if not mentionned otherwise, the functions used can be found in the global_navigation.py file. The path finding is done in three parts : the vision needed to find the static obstacles, the creation of the visibility graph and the computing of the optimal path. We use the following image as an example instead of a camera feed to showcase the steps for the global navigation :
 <center><div><img src = "images\shapes.png" width = 500></div></center>
 
-
 ### Vision for the obstacles
-The vision needed to find the obstacles has been included in the global navigation module instead of the vision module to simplify the creation of the functions for the optimal path finding. We decided to use black convex polygons as obstacles to simplify their detection. The first step to get the obstacles is to apply some image processing. First, we apply blurring filters (Gaussian and median) to remove noise and small features. Then we apply an adaptive thresholding which lets us apply morphological operations to the image. Those operations are done with <code>cv2.morphologyEx()</code> and <code>cv2.dilate()</code> methods of OpenCV. All this processing is done by the following function :
+The vision needed to find the obstacles has been included in the global navigation module instead of the vision module to simplify the creation of the functions for the optimal path finding. We decided to use black convex polygons as obstacles to simplify their detection. The first step to get the obstacles is to apply some image processing. First, we apply blurring filters (Gaussian and median) to remove noise and small features. Then we apply an adaptive thresholding which lets us apply morphological operations to the image. Those operations are done with <code>cv2.morphologyEx()</code> and <code>cv2.dilate()</code> methods of OpenCV. In our case, we use a morphological gradient, which basically gives the difference between the eroded and dilated image to find edges. All this processing is done by the following function :
 ```py
 def prepareImage(frame, threshold = 100):
     kernel = np.ones((2,2),np.uint8)
@@ -196,69 +122,23 @@ def prepareImage(frame, threshold = 100):
 After the processing, we get the following result :
 <center><div><img src = "images\Processed_Image.png" width = 500></div></center>
 
-We can then find the contours of our shapes and reducing them to only the main vertices of the polygons. This is the main reason why simple shapes have been chosen as obstacles, but the code should still work with more complex shapes. The contours are found using the <code>cv2.findContours()</code> method.
-```py
-def drawSimplifiedContours(contours, img, scalingFactor):
-    listContour = list()
-    if len(contours) > 0:
-        for cont in contours:
-            # We try to find the small contours to delete them
-            # by looking at the smallest square area that they can fill
-            [_ , (height, width), _] = cv2.minAreaRect(cont)
-            area = height*width
-            if area < 2500: # equivalent to a square of 50x50 px
-                continue
-            
-            # Approximation on contour into few points and scaling of those points
-            contour_approx = approx_contour(cont)
-            
-            contour_scaled = scalePoints(contour_approx, 11.5/scalingFactor)
+We can then find the contours of our shapes and reduce them to only the main vertices of the polygons. This is the main reason why simple shapes have been chosen as obstacles, but the code should still work with more complex shapes. The contours are found using the <code>cv2.findContours()</code> method.
 
-            # All the points that have been scaled outside of the ROI are given
-            # a big value so that the optimal path finding does not consider them
-            for point in contour_scaled:
-                print("testing point ", point[0,0], point[0,1])
-                y_max = img.shape[1]
-                x_max = img.shape[0]
-
-                if point[0, 0] > y_max:
-                    print("big >y")
-                    point[0,0] = BIG_VALUE
-                elif point[0,0] < 0:
-                    print("big <y")
-                    point[0,0] = -BIG_VALUE
-                
-                if point[0,1] > x_max:
-                    print("big >x")
-                    point[0,1] = BIG_VALUE
-                elif point[0,1] < 0: 
-                    print("big <x")
-                    point[0,1] = -BIG_VALUE
-                print("testing point ", point[0,0], point[0,1])
-
-            
-            listContour.append(contour_scaled[:,0,:])
-            cv2.drawContours(img, contour_scaled, -1, (0,0,255), 10)
-    else:
-        print("No contour found")
-    
-    return img, listContour
-```
-The previous function returns the list of all the simplified contours, from function <code>approx_contour()</code>, scaled by a value corresponding to a bit more than the length of the Thymio in pixels from from function <code>scalePoints()</code>. The scaling is done by using as a direction the vector given by the sum of the pair of vectors created by using the main vertice and the two adjacent vertices. This vector is nromalized and scaled by the legnth of the Thymio. This method of scaling does not work with concave shape as they would by scaled inward. Here is the resulting image :
+The <code>drawSimplifiedContours()</code> function returns the list of all the simplified contours, from function <code>approx_contour()</code>, scaled by a value corresponding to a bit more than the length of the Thymio in pixels from function <code>scalePoints()</code>. The scaling is done by using as a direction the vector given by the sum of the pair of vectors created by using the main vertex and the two adjacent vertices. This vector is normalized and scaled by the length of the Thymio. This method of scaling does not work with concave shapes, as they would be scaled inward. Here is the resulting image :
 <center><div><img src = "images\Scaled_contours.png" width = 500></div></center>
-With, in green, the normal contour and, in red, the scaled one. It is possible to see that the bottom vertice of the hexagon is not correct, this is due to the fact that the contour is not detected at the exact position of the vertice after the dilation of the shape. Still, the result is good enough. It is also important to note that some points can end up outside the ROI after the scaling. In our case, the Thymio could still follow the path with the help of the Kalmann filter, but we decided to remove them to make the code more robust. This was done by making those points a big value such that they are not considered for the optimal path planning.
+
+With, in green, the normal contour and, in red, the scaled one. It is possible to see that the bottom vertex of the hexagon is not correct, this is due to the fact that the contour is not detected at the exact position of the vertex after the dilation of the shape. Still, the result is good enough. It is also important to note that some points can end up outside the ROI after the scaling. In our case, the Thymio could still follow the path with the help of the Kalmann filter, but we decided to remove them to make the code more robust. This was done by making those points a big value such that they are not considered for the optimal path planning.
 
 ### Visibility graph
-For this part, we decided to use a module called PyVisGraph, which can compute the visibility graph if we give the obstacles as a set of points. This module is used because the creation of the visibility graph is optimized and simple to implement, it can find the shortest path. 
+For this part, we decided to use a module called PyVisGraph, which can compute the visibility graph if we give the obstacles as a set of points. This module is used because the creation of the visibility graph is optimized and simple to implement, and it can also find the shortest path. 
 
-As explained before, we get the simplified and scaled contours of the obstacles in a list using the <code>getVisibilityGraph()</code> method from the <code>Vision_Thymio</code> class, to which we add the start and goal position with the <code>addStartAndGoal()</code>. We then use <code>VisGraph()</code> class and <code>build()</code> method to compute the graph. The method this module uses is by checking for all pairs of points if there's ans obstacle between them, and if not connects them.
+As explained before, we get the simplified and scaled contours of the obstacles in a list using the <code>getVisibilityGraph()</code> method from the <code>Vision_Thymio</code> class, to which we add the start and goal position with the <code>addStartAndGoal()</code>. We then use the <code>VisGraph</code> class and <code>build()</code> method to compute the graph. This method takes a list of points array defining the shape of all the obstacles. The way this module creates the graph is by checking if there's an obstacle between any pair of points, and if not they are connected.
 
 ### Optimal path
-The PyVisGraph module has a <code>shortest_path</code> method in the <code>VisGraph()</code> class. This method uses the Djikstra algortihm to compoute the optimal path given a start and goal position. Here is the result obtained with the axample image :
+The PyVisGraph module has a <code>shortest_path()</code> method in the <code>VisGraph</code> class. This method uses the Dijkstra algorithm to compute the optimal path with a given start and goal position. Here is the result obtained with the example image :
 <center><div><img src = "images\Optimal_path.png" width = 500></div></center>
 
-
-
+The code used to do the simulation can be found inside the `test` directory, in the `global_navigation_test.py` file.
 
 ## 3. Filtering
 ### Extended Kalman Filter Model
@@ -481,7 +361,7 @@ To make the Thymio go forward during the obstacle avoidance phase, a constant ve
 
 The main difference with the code used during the exercise session, is that in that case the routine has been run on the Thymio using the Aseba transpiler. To integrate the obstacle avoidance in the whole project, the routine is run in Python on the computer. For this reason, the communication latency has to be taken into account, and this leads to the necessity to tune the sampling time in an effective way, as will be explained after.
 
-The weights of the two neurons have been tuned empirically by trial and error. One interesting detail to note is that for the central sensor two different weigths have been chosen for the left and right wheel. This is because otherwise the Thymio could get blocked in case of an obstacle exactly in front of the robot and perpendicular to the longitudinal line of the Thymio. By setting asymmetrical weights, the Thymio will rotate and not get blocked in this situation.
+The weights of the two neurons have been tuned empirically by trial and error. One interesting detail to note is that for the central sensor two different weights have been chosen for the left and right wheel. This is because otherwise the Thymio could get blocked in case of an obstacle exactly in front of the robot and perpendicular to the longitudinal line of the Thymio. By setting asymmetrical weights, the Thymio will rotate and not get blocked in this situation.
 
 
 
