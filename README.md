@@ -151,13 +151,13 @@ The goal of the filtering submodule is to to the sensor fusion between the data 
 
 To estimate the position and oritentation of a differential drive robot for the next timestep, following simplified discrete time state space model can be used assuming a sufficiently small timestep.
 
-$$
+```math
 \begin{align*}
 x_{i+1} &= x_i + \bar{v}_i \cdot \Delta t \cdot \cos(\theta_i)\\
 y_{i+1} &= y_i + \bar{v}_i \cdot \Delta t \cdot \cos(\theta_i)\\
 \theta_{i+1} &= \theta_i + \omega_i \cdot \Delta t
 \end{align*}
-$$
+```
 
 Since the model that we have chosen is nonlinear with respect to the orientation of the robot, standard Kalman filter formulation İs not sufficient. For this reason, we used the Extended Kalman Filter model.
 ### Extended Kalman Filter Model
