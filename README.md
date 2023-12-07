@@ -3,6 +3,8 @@ Project for the EPFL course Basics of Mobile Robotics.
 
 2023, fall semester
 
+Note: the visualization of the formulas in the report has been written using LaTeX syntax. The visualization works right in VSCode, but may not work properly using other programs (Jupyter Notebook).
+
 # Group members
 Badil Mujovi (274632) - First year MSc in Robotics, previously did a Bachelor at HEIG-VD in Microengineering \
 Aubin Mercier (316260) - First year MSc in Robotics, previously did a BSc at EPFL in Microengineering\
