@@ -1,3 +1,8 @@
+# Mobile Robotics Project
+# Local Navigation Submodule
+# Author: Badil Mujovi
+# 2023, fall semester
+
 import numpy as np
 import cv2
 from math import dist
