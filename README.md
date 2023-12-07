@@ -354,21 +354,6 @@ The path is given as a list of tuples (x,y) representing the waypoints of the pa
 The function which is called at every loop iteration is `control`, whose role is to decide whether to apply the controller to follow the path or the local avoidance routine.
 The system starts in the <i>path_follow</i> modality, which is changed to <i>obstacle_avoidance</i> whenever the proximity sensor detect an obstacle. When no obstacle is detected anymore, the obstacle avoidance routine will be run for the following 7 loop cycles before going back to the <i>path_follow</i> mode, to ensure that the obstacle is really been overcome and that the Thymio is far enough from it.
 
-
-#### Obstacle avoidance routine
-The obstacle avoidance routine, as implemented in the `obst_avoid` function, is a simple application of a Neural Network as seen during the course.
-<center><div><img src = "images\NNobstacleAvoidance.png" width = 350></div></center>
-
-The input of the network are the readings of the sensors, which are then multiplied by the weights and summed together to get the velocity of the motors.
-The two rear sensors of the Thymio have been assigned zero weight, as the Thymio will always move forward so it cannot detect any obstacle from the rear.
-To make the Thymio go forward during the obstacle avoidance phase, a constant velocity is added to both neurons as an additional fixed input.
-
-The main difference with the code used during the exercise session, is that in that case the routine has been run on the Thymio using the Aseba transpiler. To integrate the obstacle avoidance in the whole project, the routine is run in Python on the computer. For this reason, the communication latency has to be taken into account, and this leads to the necessity to tune the sampling time in an effective way, as will be explained after.
-
-The weights of the two neurons have been tuned empirically by trial and error. One interesting detail to note is that for the central sensor two different weights have been chosen for the left and right wheel. This is because otherwise the Thymio could get blocked in case of an obstacle exactly in front of the robot and perpendicular to the longitudinal line of the Thymio. By setting asymmetrical weights, the Thymio will rotate and not get blocked in this situation.
-
-
-
 #### Path follow routine
 The function `path_follow` has the pose of the Thymio as the only parameter, as the path is defined as an attribute of the Local Navigation class.
 The idea is that the two variables to control are the linear and angular velocities, respectively $ v $ and $ \omega $.
@@ -385,6 +370,18 @@ where $ \theta $ is the orientation of the Thymio and $ \gamma $ is the angle of
 The routine checks if the waypoint has been reached, by checking that the actual pose is within a distance $ \epsilon $ of the waypoint. If the condition is true, the `waypoint_counter` variable is incremented and the function is called recursively, until the last goal is reached.
 
 The gain value $ K_p $, the fixed velocity $ v_{fixed} $, and the $ \epsilon $ parameter have been tuned empiricaly by trial and error to obtain the best performance possible of the system as a whole.
+
+#### Obstacle avoidance routine
+The obstacle avoidance routine, as implemented in the `obst_avoid` function, is a simple application of a Neural Network as seen during the course.
+<center><div><img src = "images\NNobstacleAvoidance.png" width = 350></div></center>
+
+The input of the network are the readings of the sensors, which are then multiplied by the weights and summed together to get the velocity of the motors.
+The two rear sensors of the Thymio have been assigned zero weight, as the Thymio will always move forward so it cannot detect any obstacle from the rear.
+To make the Thymio go forward during the obstacle avoidance phase, a constant velocity is added to both neurons as an additional fixed input.
+
+The main difference with the code used during the exercise session, is that in that case the routine has been run on the Thymio using the Aseba transpiler. To integrate the obstacle avoidance in the whole project, the routine is run in Python on the computer. For this reason, the communication latency has to be taken into account, and this leads to the necessity to tune the sampling time in an effective way, as will be explained after.
+
+The weights of the two neurons have been tuned empirically by trial and error. One interesting detail to note is that for the central sensor two different weights have been chosen for the left and right wheel. This is because otherwise the Thymio could get blocked in case of an obstacle exactly in front of the robot and perpendicular to the longitudinal line of the Thymio. By setting asymmetrical weights, the Thymio will rotate and not get blocked in this situation.
 
 ### Simulating the controller
 To make sure that the controller works before testing it with the Thymio, a simulation has been done as a proof of concept.
