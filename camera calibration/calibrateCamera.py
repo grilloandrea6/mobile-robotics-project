@@ -1,5 +1,6 @@
 """
-This code assumes that images used for calibration are of the same arUco marker board provided with code
+This code assumes that images used for calibration are of the same arUco marker board provided with code.
+The code used here is not mine and is from some forums that used the OpenCV camera calibration with ChAruco boards.
 
 """
 # USE pip install opencv-contrib-python==4.6.0.66
