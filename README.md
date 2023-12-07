@@ -93,7 +93,8 @@ In our case, the markers with IDs 1 and 2 corresponds respectively to the thymio
 ### Perspective transformation
 For our work, we need to find the position of the thymio, the goal and the obstacles with respect to our ROI. To do that, we find the Arcuo markers of our ROI and get the position of their inner corners. Then, by using the <code>cv2.getPerspectiveTransform()</code> method, we can map this ROI into a new image with corrected perspective and get a transformation matrix. In our case, we measured the size of our ROI in centimeters, which let us get an image with the same aspect ratio. The <code>getPerspectiveAndScaling()</code> method in the <code>Vision_Thymio</code> class gives us the desired result.
 
-This method also gives us a scaling value in $cm/px$ to compute the real distances of each points. We then used the <code>getCorrectedImage()</code> method from the <code>Vision_Thymio</code> class to get the transformed image. An example code can't be given for this part as it would depend heavily on the detection of the aruco markers as we intended.
+This method also gives us a scaling value in $cm/px$ to compute the real distances of each points. We then used the <code>getCorrectedImage()</code> method from the <code>Vision_Thymio</code> class to get the transformed image. An example code can't be given for this part as it would depend heavily on the detection of the aruco markers as we intended. Here's the stage we used (the pdf file can be found in the images folder) :
+<center><div><img  src = "images\stage_used.png" width = 500></div></center>
 
 ## 2. Path Planning
 <a id='section_id'></a>
