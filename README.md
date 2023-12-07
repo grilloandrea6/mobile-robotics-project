@@ -5,7 +5,7 @@ Project for the EPFL course Basics of Mobile Robotics.
 
 # Group members
 Badil Mujovi (274632) - Currently in Robotics, previously did a Bachelor at HEIG-VD in Microengineering \
-Aubin Mercier (316260)\
+Aubin Mercier (316260) - First year MSc in Robotics, previously did a BSc at EPFL in Microengineering\
 Mehmet Furkan Dogan (370234)\
 Andrea Grillo (371099) - First year MSc in Robotics, coming for a BSc in Computer Science at Politecnico di Torino \
 
@@ -397,4 +397,6 @@ The result of the simulation can be seen in the graph below:
 
 The code used to do the simulation can be found inside the `test` directory, in the `local_navigation_test.py` file.
 
+
+## Conclusion
 
