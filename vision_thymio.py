@@ -1,3 +1,11 @@
+"""
+Code written by Badil Mujovi
+
+Project for the EPFL course Basics of Mobile Robotics.
+
+2023, fall semester
+"""
+
 import numpy as np
 import cv2
 import global_navigation as gn

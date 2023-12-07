@@ -1,3 +1,11 @@
+"""
+Code written by Badil Mujovi
+
+Project for the EPFL course Basics of Mobile Robotics.
+
+2023, fall semester
+"""
+
 from global_navigation import *
 
 frame = cv2.imread("images/shapes.png")

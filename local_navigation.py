@@ -1,3 +1,8 @@
+# Mobile Robotics Project
+# Local Navigation Submodule
+# Author: Andrea Grillo
+# 2023, fall semester
+
 import math
 
 # CONSTANT DEFINITION
