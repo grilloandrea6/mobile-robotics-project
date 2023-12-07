@@ -15,11 +15,12 @@ class Vision_Thymio(object):
     # - 1 for the pos and direction of the thymio
     # - 2 for the goal
     # - 3, 4, 5, and 6 to get the scaling factor and perspective transformation matrix
-        
+    
     def initDictAruco(self,type = cv2.aruco.DICT_4X4_50):
         dict = cv2.aruco.getPredefinedDictionary(type)
         return dict
 
+    # Return the id and corners of the markers found
     def detectArucoMarkers(self, img):
         marker_ids = []
         corners = []
@@ -42,7 +43,7 @@ class Vision_Thymio(object):
         # These are the values used to correct different types of opticals aberations
         # such as spherical or tangential aberation. 
         # These values have been found after following a calibration process
-        # (opencv camera calibration with charuco patterns)
+        # (opencv camera calibration with a ChAruco board)
         
         mtx = np.array([[989.7401734,  0.,           653.72226958],
                         [0.,           998.64802591, 347.61109886],
@@ -65,7 +66,7 @@ class Vision_Thymio(object):
 
     # The perspective transformation is found by takeing 4 corners of the ROI
     # We can then map our image to a new one with corrected perspective.
-    def getPerspectiveAndScaling(self, width_roi=48.4, height_roi= 31):
+    def getPerspectiveAndScaling(self, width_roi=48.4, height_roi=31):
         
         # Need to measure the size of the ROI in real life
         ratio_vh = width_roi/height_roi
@@ -73,7 +74,7 @@ class Vision_Thymio(object):
         
         # loops until good transform matrix found 
         while len(transformMatrix) == 0:
-            _ , img = self.cap.read()
+            img = self.getFrame()
             ids, corners = self.detectArucoMarkers(img)
             wmax = 0
             hmax = 0
@@ -91,20 +92,21 @@ class Vision_Thymio(object):
                 pointC = mark5[0,:]
                 pointD = mark6[3,:]
 
+                # Previous ROI
                 inputPoints = np.array([pointA, pointB, pointC, pointD],np.float32)
                 
+                # Dimensions of new ROI with same aspect ratio
                 hmax = img.shape[1]
                 wmax = hmax*ratio_vh
                 
+                # New ROI
                 outputPoints = np.array([[0, 0],
                                 [0, hmax],
                                 [wmax, hmax],
                                 [wmax, 0]], np.float32)
 
                 transformMatrix = cv2.getPerspectiveTransform(inputPoints, outputPoints)
-                
                 sizeROI = np.array([hmax, wmax]).astype(int)
-                
                 scalingFactor = height_roi/hmax
             else:
                 transformMatrix = []
@@ -114,15 +116,16 @@ class Vision_Thymio(object):
 
         self.transformMatrix, self.sizeROI, self.scalingFactor = transformMatrix, sizeROI, scalingFactor
 
+    # Return image with corrected perspective
     def getCorrectedImage(self):
         img = self.getFrame()
         origImg = img
         img = cv2.warpPerspective(img, self.transformMatrix ,(self.sizeROI[1], self.sizeROI[0]),flags=cv2.INTER_LINEAR)
 
         return img, origImg
-        
-   
-    def getGoalPosition(self, ids, corners):    
+
+    # Detect marker with id 2 as goal position
+    def getGoalPosition(self, ids, corners): 
         position = []
         found = False
         
@@ -133,9 +136,9 @@ class Vision_Thymio(object):
             # Position is the mean value of each corner of the marker
             position = (np.sum(mark, 0)/4).astype(int)
 
-        
         return found, position*self.scalingFactor if found else position
 
+    # Detects marker with id 1 as thymio position
     def getThymioPos(self, ids, corners):
         position = []
         orientation = []
@@ -158,10 +161,6 @@ class Vision_Thymio(object):
 
             pose = position, orientation
 
-            #AG - comment
-            # img = cv2.circle(img, position, radius = 0, color = (0,0,255), thickness=5)
-            #img = cv2.line(img,mark[0,:].astype(int), mark[-1,:].astype(int), color = (255,0,0), thickness=2)
-
         return found, pose # AG - , img
 
     # ========================================================
@@ -178,21 +177,12 @@ class Vision_Thymio(object):
         
     # ========================================================
 
-    # Need to find the visibility graph without the goal and start positions
+    # Need to find the visibility graph
     def getVisibilityGraph(self, img):
         thresh = gn.prepareImage(img)
         
         contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            
         frame, contourList = gn.drawSimplifiedContours(contours, img, self.scalingFactor)
-        
-        # AG - commented to be used in jupyter notebook
-        #cv2.imshow("ContourList",frame)
-        #while True:
-        #    if cv2.waitKey(1) & 0xFF == ord('q'):
-        #        break
-        #cv2.destroyAllWindows()
-
 
         return contourList, frame
 

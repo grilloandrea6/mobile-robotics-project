@@ -5,6 +5,7 @@ import pyvisgraph as vg
 
 BIG_VALUE = 100000
 
+# Basic preprocessing done on the image to get the shape of the obstacles
 def prepareImage(frame, threshold = 100):
     kernel = np.ones((2,2),np.uint8)
 
@@ -17,25 +18,24 @@ def prepareImage(frame, threshold = 100):
     _ ,thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
     # Morphological transfsormations to get the outline of an object
-    # Done by taking the difference between the dilated img and itself.
+    # Done by taking the difference between the dilated and eroded img.
+    # We also apply a dilation to make the outline bigger.
     thresh = cv2.morphologyEx(thresh, cv2.MORPH_GRADIENT, kernel)
     thresh = cv2.dilate(thresh, kernel, iterations = 5)
         
     return thresh
 
+# Simplyfing contours by considering two points and deleting all the points
+# vetween them that are inside a mergin epsilon
 def approx_contour(contour, epsilon = 10.0, closed = True):
     # Delete unnecessary points within a margin on a straight line
-    contour_approx = cv2.approxPolyDP(contour, epsilon = 10.0, closed = True)
+    contour_approx = cv2.approxPolyDP(contour, epsilon = epsilon, closed = closed)
     return contour_approx
 
-def contourCenter(contour):
-    M = cv2.moments(contour)
-    cX = int(M["m10"] / M["m00"])
-    cY = int(M["m01"] / M["m00"])
-    center = [cX, cY]
-    return center
-
-def scalePointsFromCenter(points, length):
+# The scaling of the contours is done by taking the sum of the vectors
+# given by the two adjacent points to a vertice and moving it in the resulting
+# direction scaled by the length of the thymio in pixels
+def scalePoints(points, length):
     for p in range(points.shape[0]):
         
         scalingDirection = np.array([0,0])
@@ -55,6 +55,7 @@ def scalePointsFromCenter(points, length):
 
     return points
 
+
 def drawSimplifiedContours(contours, img, scalingFactor):
     listContour = list()
     if len(contours) > 0:
@@ -69,8 +70,10 @@ def drawSimplifiedContours(contours, img, scalingFactor):
             # Approximation on contour into few points and scaling of those points
             contour_approx = approx_contour(cont)
             
-            # There's a problem with the center calculation
-            contour_scaled = scalePointsFromCenter(contour_approx, 11.5/scalingFactor)
+            contour_scaled = scalePoints(contour_approx, 11.5/scalingFactor)
+
+            # All the points that have been scaled outside of the ROI are given
+            # a big value so that the optimal path finding does not consider them
             for point in contour_scaled:
                 print("testing point ", point[0,0], point[0,1])
                 y_max = img.shape[1]
@@ -99,9 +102,8 @@ def drawSimplifiedContours(contours, img, scalingFactor):
     
     return img, listContour
 
+
 def addStartAndGoal(contourList, start, goal, scalingFactor):
-    #AG - not needed - y, x = img.shape[0:2]
-    #print(contourList)
     start = np.array(([(start/scalingFactor)]),np.int32)
     goal = np.array(([(goal/scalingFactor)]),np.int32)
     
@@ -112,11 +114,14 @@ def addStartAndGoal(contourList, start, goal, scalingFactor):
     #print(contourList)
     return contourList
 
+
 def findShortestPath(contourList):
     polyList = list()
     poly = list()   
     
-    #Goal is not appended right in the poly list
+    # Create the list of points to 
+    # be used for visibility graph.
+    # The obstacles are considered to be polygons.
     for obstacle in contourList[:]:
         polyList = list()
         for i in range(len(obstacle)):
@@ -124,11 +129,12 @@ def findShortestPath(contourList):
             
         poly.append(polyList)
 
-    #print(poly)
+    # Create the visibillity graph and find optimal path
     g = vg.VisGraph()
     g.build(poly[:], status = False)
     shortest = g.shortest_path(vg.Point(contourList[0][0,0], contourList[0][0,1]), vg.Point(contourList[-1][0,0], contourList[-1][0,1]))
 
+    # Convert optimal path to np arrays
     shortestPath = list()
     for p in shortest:
         shortestPath.append(np.array([p.x, p.y]))
