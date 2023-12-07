@@ -6,7 +6,7 @@ Project for the EPFL course Basics of Mobile Robotics.
 # Group members
 Badil Mujovi (274632) - Currently in Robotics, previously did a Bachelor at HEIG-VD in Microengineering \
 Aubin Mercier (316260) - First year MSc in Robotics, previously did a BSc at EPFL in Microengineering\
-Mehmet Furkan Dogan (370234)\
+Mehmet Furkan Dogan (370234) - First year MSc in Mechanical Engineering, previously did a BSc in Mechanical Engineering and Mechatronics at Middle East Technical University\
 Andrea Grillo (371099) - First year MSc in Robotics, coming for a BSc in Computer Science at Politecnico di Torino
 
 
@@ -149,7 +149,15 @@ The code used to do the simulation can be found inside the `test` directory, in 
 ## 3. Filtering
 The goal of the filtering submodule is to to the sensor fusion between the data coming from the computer vision and the odometry obtained from the Thymio. The system ensure that in the case that the camera is not a reliable source of data for the positioning of the robot (camera covered, malfunctioning of the computer vision submodule) the system can continue to work.
 
-The model that we have chosen is not linear, so the standard Kalman filter formulation was not sufficient. For this reason, we used the Extended Kalman Filter model.
+To estimate the position and oritentation of a differential drive robot for the next timestep, following simplified discrete time state space model can be used assuming a sufficiently small timestep.
+
+$$
+x_{i+1} = x_i + \bar{v}_i \cdot \Delta t \cdot \cos(\theta_i)\\
+y_{i+1} = y_i + \bar{v}_i \cdot \Delta t \cdot \cos(\theta_i)\\
+\theta_{i+1} = \theta_i + \omega_i \cdot \Delta t
+$$
+
+Since the model that we have chosen is nonlinear with respect to the orientation of the robot, standard Kalman filter formulation İs not sufficient. For this reason, we used the Extended Kalman Filter model.
 ### Extended Kalman Filter Model
 We are using the following model for extended Kalman filter implementation:
 $$
