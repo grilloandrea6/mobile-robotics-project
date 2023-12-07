@@ -400,3 +400,14 @@ The code used to do the simulation can be found inside the `test` directory, in 
 
 ## Conclusion
 
+Incorporating OpenCV, we calibrated the camera, detected ArUco markers for localization, and applied perspective transformation for real-world mapping. Despite successes in accurate positioning, contour detection presented challenges, impacting precision. Nevertheless, our computer vision framework established the foundation for our robot's environment perception within the navigation system.
+
+Our path planning strategy covered obstacle detection through image processing, visibility graph creation using simplified obstacle contours, and computing an optimal path via Dijkstra's algorithm. The path was calculated with respect to obstacles, ensuring effective navigation.
+
+The Extended Kalman Filter model was adeptly used for sensor fusion, merging data from vision and odometry. Tuning covariance matrices was essential for accurate data interpretation and reliable robot behavior.
+
+The local navigation submodule skillfully combined path following and obstacle avoidance. The controller effectively steered the Thymio along the precomputed path while adapting to dynamic obstacles via an obstacle avoidance routine.
+
+Our system encapsulates various modules harmoniously, leveraging computer vision for environment mapping, path planning for efficient navigation, filtering for robustness against sensor issues, and local navigation for adaptable real-time movement. Despite its comprehensive nature, potential challenges lie in tuning parameters for optimal performance across diverse scenarios and accounting for latency in the obstacle avoidance routine, especially when integrated into a physical Thymio.
+
+We've achieved a versatile robotics system, but continuous optimization and real-world testing remain essential for enhancing its adaptability and reliability in dynamic environments.
