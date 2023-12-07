@@ -352,7 +352,7 @@ To tune the measurement covariance matrix, we used the measured speed values whe
 
 <center><div><img src = "images\wheel_speed_distribution.png" width = 350></div></center>
 
-To find the wheel speed sensor noise covariance matrix, the following error distribution is used.
+To find the wheel speed sensor noise covariance matrix, the following error distribution is used. Since that distribution closely resembles the normal distribution, we can assume that it can be represented by a Gaussian distribution. That assumption allows us to use Kalman filter for state estimation.
 
 <center><div><img src = "images\measurement_error_distribution.png" width = 350></div></center>
 
